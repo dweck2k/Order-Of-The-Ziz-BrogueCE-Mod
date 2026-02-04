@@ -882,7 +882,7 @@ void pickUpItemAt(pos loc) {
         }
 
         if ((theItem->category & AMULET) && numberOfMatchingPackItems(AMULET, 0, 0, false)) {
-            message("you already have the Amulet of Yendor.", 0);
+            message("you already have the Seal of the Ziz.", 0);
             deleteItem(theItem);
             return;
         }
@@ -1665,7 +1665,7 @@ void itemName(item *theItem, char *root, boolean includeDetails, boolean include
             sprintf(root, "gold piece%s", pluralization);
             break;
         case AMULET:
-            sprintf(root, "%sAmulet%s of Yendor%s", yellowEscapeSequence, pluralization, baseEscapeSequence);
+            sprintf(root, "%sSeal%s of the Ziz%s", yellowEscapeSequence, pluralization, baseEscapeSequence);
             break;
         case GEM:
             sprintf(root, "%slumenstone%s%s from depth %i", yellowEscapeSequence, pluralization, baseEscapeSequence, theItem->originDepth);

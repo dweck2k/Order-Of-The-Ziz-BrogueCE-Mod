@@ -668,7 +668,7 @@ const meteredItemGenerationTable meteredItemsGenerationTable_BulletBrogue[] = {
 
 // levelFeelings[0] -> AMULET_LEVEL, levelFeelings[1] -> DEEPEST_LEVEL
 levelFeeling levelFeelings_BulletBrogue[] = {
-    { .message = "An alien energy permeates the area. The Amulet of Yendor must be nearby!", .color = &itemMessageColor },
+    { .message = "A divine presence fills the air. The Seal of the Ziz must be nearby!", .color = &itemMessageColor },
     { .message = "An overwhelming sense of peace... nah, not in this dungeon.", .color = &lightBlue }
 };
 
@@ -677,7 +677,7 @@ itemTable potionTable_BulletBrogue[] = {
     {"strength",            itemColors[2], "",  0,  400,    0, 0, {2,2,0}, false, false, 1,  false, "This powerful medicine will course through your muscles, permanently increasing your strength by one point."}, // frequency is dynamically adjusted
     {"telepathy",           itemColors[3], "",  20, 350,    0, 0, {50,50,0}, false, false, 1,  false, "This mysterious liquid will attune your mind to the psychic signature of distant creatures. Its effects will not reveal inanimate objects, such as totems, turrets and traps."},
     {"levitation",          itemColors[4], "",  15, 250,    0, 0, {75,75,0}, false, false, 1,  false, "This curious liquid will cause you to hover in the air, able to drift effortlessly over lava, water, chasms and traps. Flames, gases and spiderwebs fill the air, and cannot be bypassed while airborne. Creatures that dwell in water or mud will be unable to attack you while you levitate."},
-    {"detect magic",        itemColors[5], "",  20, 500,    0, 0, {0,0,0}, false, false, 1,  false, "This mysterious brew will sensitize your mind to the radiance of magic. Items imbued with helpful enchantments will be marked with a full sigil; items corrupted by curses or designed to bring misfortune upon the bearer will be marked with a hollow sigil. The Amulet of Yendor will be revealed by its unique aura."},
+    {"detect magic",        itemColors[5], "",  20, 500,    0, 0, {0,0,0}, false, false, 1,  false, "This mysterious brew will sensitize your mind to the radiance of magic. Items imbued with helpful enchantments will be marked with a full sigil; items corrupted by curses or designed to bring misfortune upon the bearer will be marked with a hollow sigil. The Seal of the Ziz will be revealed by its unique aura."},
     {"speed",               itemColors[6], "",  10, 500,    0, 0, {25,25,0}, false, false, 1,  false, "Quaffing the contents of this flask will enable you to move at blinding speed for several minutes."},
     {"fire immunity",       itemColors[7], "",  15, 500,    0, 0, {75,75,0}, false, false, 1,  false, "This potion will render you impervious to heat and permit you to wander through fire and lava and ignore otherwise deadly bolts of flame. It will not guard against the concussive impact of an explosion, however."},
     {"invisibility",        itemColors[8], "",  15, 400,    0, 0, {50,50,0}, false, false, 1,  false, "Drinking this potion will render you temporarily invisible. Enemies more than two spaces away will be unable to track you."},

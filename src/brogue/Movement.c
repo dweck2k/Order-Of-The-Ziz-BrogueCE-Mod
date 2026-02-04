@@ -195,7 +195,7 @@ void describeLocation(char *buf, short x, short y) {
     if (magicItem && !(pmap[x][y].flags & DISCOVERED)) {
         switch (itemMagicPolarity(magicItem)) {
             case 1:
-                strcpy(object, magicItem->category == AMULET ? "the Amulet of Yendor" : "benevolent magic");
+                strcpy(object, magicItem->category == AMULET ? "the Seal of the Ziz" : "benevolent magic");
                 break;
             case -1:
                 strcpy(object, "malevolent magic");
@@ -2197,7 +2197,7 @@ boolean useStairs(short stairDirection) {
         } else {
             confirmMessages();
             messageWithColor("the crystal archway repels you with a mysterious force!", &lightBlue, 0);
-            messageWithColor("(Only the bearer of the Amulet of Yendor may pass.)", &backgroundMessageColor, 0);
+            messageWithColor("(Only the bearer of the Seal of the Ziz may pass.)", &backgroundMessageColor, 0);
         }
         succeeded = true;
     } else {
@@ -2215,7 +2215,7 @@ boolean useStairs(short stairDirection) {
         } else {
             confirmMessages();
             messageWithColor("The dungeon exit is magically sealed!", &lightBlue, 0);
-            messageWithColor("(Only the bearer of the Amulet of Yendor may pass.)", &backgroundMessageColor, 0);
+            messageWithColor("(Only the bearer of the Seal of the Ziz may pass.)", &backgroundMessageColor, 0);
         }
     }
 

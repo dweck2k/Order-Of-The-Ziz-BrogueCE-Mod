@@ -27,6 +27,7 @@
 #include "GlobalsBrogue.h"
 #include "GlobalsRapidBrogue.h"
 #include "GlobalsBulletBrogue.h"
+#include "Stories.h"
 
 #include <time.h>
 
@@ -156,10 +157,10 @@ static const char *getOrdinalSuffix(int number) {
 
 static void welcome() {
     char buf[DCOLS*3], buf2[DCOLS*3];
-    message("Hello and welcome, adventurer, to the Dungeons of Doom!", 0);
+    message("Shalom, seeker of truth, welcome to the Depths of the Ziz!", 0);
     strcpy(buf, "Retrieve the ");
     encodeMessageColor(buf, strlen(buf), &itemMessageColor);
-    strcat(buf, "Amulet of Yendor");
+    strcat(buf, "Seal of the Ziz");
     encodeMessageColor(buf, strlen(buf), &white);
     sprintf(buf2, " from the %i%s floor and escape with it!", gameConst->amuletLevel, getOrdinalSuffix(gameConst->amuletLevel));
     strcat(buf, buf2);
@@ -167,7 +168,7 @@ static void welcome() {
     if (KEYBOARD_LABELS) {
         messageWithColor("Press <?> for help at any time.", &backgroundMessageColor, 0);
     }
-    flavorMessage("The doors to the dungeon slam shut behind you.");
+    flavorMessage("The ancient gates seal behind you with a divine resonance.");
 }
 
 void initializeGameVariant() {
@@ -811,6 +812,8 @@ void startLevel(short oldLevelNumber, short stairDirection) {
         } else if (rogue.depthLevel == gameConst->deepestLevel) {
             messageWithColor(levelFeelings[1].message, levelFeelings[1].color, 0);
         }
+        // Display randomized story fragment based on depth
+        displayLevelStory(rogue.depthLevel);
     }
 
     // Position the player.
@@ -1276,7 +1279,7 @@ void victory(boolean superVictory) {
         }
         if (theItem->category == AMULET && superVictory) {
             plotCharToBuffer(G_AMULET, (windowpos){ mapToWindowX(2), min(ROWS-1, i + 1) }, &yellow, &black, &dbuf);
-            printString("The Birthright of Yendor", mapToWindowX(4), min(ROWS-1, i + 1), &itemMessageColor, &black, &dbuf);
+            printString("The Covenant of the Ziz", mapToWindowX(4), min(ROWS-1, i + 1), &itemMessageColor, &black, &dbuf);
             sprintf(buf, "%li", max(0, itemValue(theItem) * 2));
             printString(buf, mapToWindowX(60), min(ROWS-1, i + 1), &itemMessageColor, &black, &dbuf);
             totalValue += max(0, itemValue(theItem) * 2);

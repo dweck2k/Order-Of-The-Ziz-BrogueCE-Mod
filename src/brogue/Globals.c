@@ -525,7 +525,7 @@ const floorTileType tileCatalog[NUMBER_TILETYPES] = {
  /*ANCIENT_SPIRIT_VINES*/       {G_VINE,    &lichenColor,           0,                  19, 100,DF_PLAIN_FIRE,0,DF_ANCIENT_SPIRIT_GRASS, 1000,  NO_LIGHT,       (T_ENTANGLES | T_CAUSES_DAMAGE | T_IS_FLAMMABLE), (TM_STAND_IN_TILE | TM_VANISHES_UPON_PROMOTION | TM_VISUALLY_DISTINCT | TM_PROMOTES_ON_PLAYER_ENTRY),"thorned vines",       "thorned vines make a rustling noise as they quiver restlessly."}, // +tile
  /*ANCIENT_SPIRIT_GRASS*/       {G_GRASS,   &grassColor,            0,                  60, 15, DF_PLAIN_FIRE,0,0,                          0,  NO_LIGHT,       (T_IS_FLAMMABLE), (TM_STAND_IN_TILE),                                                               "a tuft of grass",      "tufts of lush grass have improbably pushed upward through the stone ground."},
 
- // Yendor amulet floor tile
+ // Ziz seal floor tile
  /*AMULET_SWITCH*/              {G_FLOOR,   &floorForeColor,        &floorBackColor,    95, 0,  DF_PLAIN_FIRE,0,0,                          0,  NO_LIGHT,       0, (TM_VANISHES_UPON_PROMOTION | TM_IS_WIRED | TM_PROMOTES_ON_ITEM_PICKUP),                         "the ground",           ""},
 
  // commutation device          char        fore color              back color        prio ign% [fire,discover,promote]Type     promoteChance   glowLight       flags mechflags                                                                                     description             flavorText
@@ -968,7 +968,7 @@ const lightSource lightCatalog[NUMBER_LIGHT_KINDS] = {
     {&ifritLightColor,      {300, 600, 1},          0,      false},     // ifrit light
     {&fireBoltColor,        {400, 600, 1},          0,      false},     // phoenix light
     {&fireBoltColor,        {150, 300, 1},          0,      false},     // phoenix egg light
-    {&yendorLightColor,     {1500, 1500, 1},        0,      false},     // Yendorian light
+    {&yendorLightColor,     {1500, 1500, 1},        0,      false},     // Ziz guardian light
     {&spectralBladeLightColor,{350, 350, 1},        0,      false},     // spectral blades
     {&summonedImageLightColor,{350, 350, 1},        0,      false},     // weapon images
     {&lightningColor,       {250, 250, 1},          35,     false},     // lightning turret light
@@ -1144,7 +1144,7 @@ creatureType monsterCatalog[NUMBER_MONSTER_KINDS] = {
         (MONST_INANIMATE | MONST_NEVER_SLEEPS | MONST_ALWAYS_HUNTING | MONST_IMMUNE_TO_FIRE | MONST_IMMUNE_TO_WEAPONS | MONST_WILL_NOT_USE_STAIRS | MONST_DIES_IF_NEGATED | MONST_GETS_TURN_ON_ACTIVATION | MONST_ALWAYS_USE_ABILITY), (MA_REFLECT_100)},
     {0, "guardian spirit",G_GUARDIAN, &spectralImageColor,1000,0,200,  {5, 12, 2},     0,  100,    100,    0,              SPECTRAL_IMAGE_LIGHT,    false,100,0,     {0},
         (MONST_INANIMATE | MONST_NEVER_SLEEPS | MONST_IMMUNE_TO_FIRE | MONST_IMMUNE_TO_WEAPONS | MONST_DIES_IF_NEGATED | MONST_ALWAYS_USE_ABILITY), (MA_REFLECT_100)},
-    {0, "Warden of Yendor",G_WARDEN, &yendorLightColor,1000,   0,    300,    {12, 17, 2},    0,  200,    200,    DF_RUBBLE,      YENDOR_LIGHT,    true,  100, 0,           {0},
+    {0, "Guardian of the Ziz",G_WARDEN, &yendorLightColor,1000,   0,    300,    {12, 17, 2},    0,  200,    200,    DF_RUBBLE,      YENDOR_LIGHT,    true,  100, 0,           {0},
         (MONST_NEVER_SLEEPS | MONST_ALWAYS_HUNTING | MONST_INVULNERABLE | MONST_NO_POLYMORPH)},
     {0, "eldritch totem",G_TOTEM, &glyphColor,80,    0,      0,      {0, 0, 0},      0,  100,    100,    DF_RUBBLE_BLOOD,0,    false,      0,      0,              {0},
         (MONST_IMMUNE_TO_WEBS | MONST_NEVER_SLEEPS | MONST_IMMOBILE | MONST_INANIMATE | MONST_ALWAYS_HUNTING | MONST_WILL_NOT_USE_STAIRS | MONST_GETS_TURN_ON_ACTIVATION | MONST_ALWAYS_USE_ABILITY), (MA_CAST_SUMMON)},
