@@ -154,12 +154,100 @@ static const char *getOrdinalSuffix(int number) {
     }
 }
 
+static void showOpeningLore() {
+    char textBuf[TEXT_MAX_LENGTH];
+    brogueButton buttons[2];
+    short result;
+
+    const char *lorePages[] = {
+        "For generations, the war was hidden.\n\n"
+        "Not fought in fields or skies, but beneath the earth, between letters, "
+        "inside names that were never meant to be spoken aloud.",
+
+        "Long before kingdoms fell and rose again, the Cult of the Ziz learned a truth forbidden to most:\n\n"
+        "That the world is not only broken -- it is being worked upon.",
+
+        "Beneath the world lie the Burrows of the Abomination.\n\n"
+        "Hollows where demons, vermin, and twisted spirits spill into being. "
+        "At their deepest point, sealed by ancient law and older fear, rests the Book of the Abomination -- "
+        "a record of its designs, its hungers, its path into history.",
+
+        "Many have searched for it. None returned.\n\n"
+        "You are not a hero. You are not chosen by prophecy. "
+        "You are a bearer of a burden passed hand to hand, generation to generation.",
+
+        "A member of the Cult.\n"
+        "Bound by oath.\n"
+        "Driven by Tikkun.\n\n"
+        "Descend. Learn what was hidden. Correct what can be corrected.\n\n"
+        "If you fall, another will follow.\n\n"
+        "The war does not end here. It only remembers."
+    };
+
+    const short numPages = 5;
+
+    for (short i = 0; i < numPages; i++) {
+        // Initialize buttons
+        initializeButton(&buttons[0]);
+        strcpy(buttons[0].text, "   Skip   ");
+        buttons[0].hotkey[0] = ESCAPE_KEY;
+
+        initializeButton(&buttons[1]);
+        if (i < numPages - 1) {
+            strcpy(buttons[1].text, "   Next   ");
+        } else {
+            strcpy(buttons[1].text, "   Begin   ");
+        }
+        buttons[1].hotkey[0] = ACKNOWLEDGE_KEY;
+        buttons[1].hotkey[1] = RETURN_KEY;
+
+        strcpy(textBuf, lorePages[i]);
+        result = printTextBox(textBuf, 10, 3, 60, &white, &black, buttons, 2);
+
+        // If Skip button pressed (button 0), break out of loop
+        if (result == 0) {
+            break;
+        }
+    }
+}
+
+static void displayCheckpointText(short checkpointIndex, short variantIndex) {
+    short depth = checkpointTexts[checkpointIndex].depth;
+
+    if (depth == 1 || depth == 26) {
+        // Modal dialog for important story moments (levels 1 and 26)
+        char textBuf[TEXT_MAX_LENGTH];
+        brogueButton OKButton;
+        initializeButton(&OKButton);
+        strcpy(OKButton.text, "     OK     ");
+        OKButton.hotkey[0] = ACKNOWLEDGE_KEY;
+        OKButton.hotkey[1] = ESCAPE_KEY;
+
+        strcpy(textBuf, checkpointTexts[checkpointIndex].variants[variantIndex]);
+        printTextBox(textBuf, COLS/3, ROWS/3, COLS/3, &white, &interfaceBoxColor, &OKButton, 1);
+    } else {
+        // Short message for other levels (non-blocking)
+        message(checkpointTexts[checkpointIndex].variants[variantIndex], 0);
+    }
+}
+
 static void welcome() {
     char buf[DCOLS*3], buf2[DCOLS*3];
-    message("Hello and welcome, adventurer, to the Dungeons of Doom!", 0);
+
+    // Show multi-page opening lore first
+    showOpeningLore();
+
+    // Clear the screen to remove any remnants from the popups
+    blackOutScreen();
+
+    // Then show Level 1 checkpoint (The Mouth of the Burrow)
+    short variantIndex = rand_range(0, 4);
+    displayCheckpointText(0, variantIndex);  // Index 0 = depth 1 checkpoint
+
+    message("Welcome, bearer of the oath, to the Burrows of the Abomination.", 0);
     strcpy(buf, "Retrieve the ");
     encodeMessageColor(buf, strlen(buf), &itemMessageColor);
-    strcat(buf, "Amulet of Yendor");
+    strcat(buf, "Book of the Abomination");
     encodeMessageColor(buf, strlen(buf), &white);
     sprintf(buf2, " from the %i%s floor and escape with it!", gameConst->amuletLevel, getOrdinalSuffix(gameConst->amuletLevel));
     strcat(buf, buf2);
@@ -167,7 +255,7 @@ static void welcome() {
     if (KEYBOARD_LABELS) {
         messageWithColor("Press <?> for help at any time.", &backgroundMessageColor, 0);
     }
-    flavorMessage("The doors to the dungeon slam shut behind you.");
+    flavorMessage("The entrance to the Burrows seals behind you.");
 }
 
 void initializeGameVariant() {
@@ -808,10 +896,33 @@ void startLevel(short oldLevelNumber, short stairDirection) {
 
     if (!levels[rogue.depthLevel-1].visited) {
         levels[rogue.depthLevel-1].visited = true;
-        if (rogue.depthLevel == gameConst->amuletLevel) {
-            messageWithColor(levelFeelings[0].message, levelFeelings[0].color, 0);
-        } else if (rogue.depthLevel == gameConst->deepestLevel) {
-            messageWithColor(levelFeelings[1].message, levelFeelings[1].color, 0);
+
+        // Check for story checkpoint texts first
+        // NOTE: Level 1 checkpoint is handled in welcome() after opening lore
+        boolean checkpointDisplayed = false;
+        const short checkpointDepths[] = {1, 5, 10, 13, 16, 19, 22, 24, 26};
+        for (int i = 0; i < 9; i++) {
+            if (rogue.depthLevel == checkpointDepths[i]) {
+                // Skip level 1 - it's shown in welcome() after backstory
+                if (rogue.depthLevel == 1) {
+                    checkpointDisplayed = true;
+                    break;
+                }
+                // Select a random variant (0-4) from the 5 available
+                short variantIndex = rand_range(0, 4);
+                displayCheckpointText(i, variantIndex);
+                checkpointDisplayed = true;
+                break;
+            }
+        }
+
+        // Display original level feelings if no checkpoint was shown
+        if (!checkpointDisplayed) {
+            if (rogue.depthLevel == gameConst->amuletLevel) {
+                messageWithColor(levelFeelings[0].message, levelFeelings[0].color, 0);
+            } else if (rogue.depthLevel == gameConst->deepestLevel) {
+                messageWithColor(levelFeelings[1].message, levelFeelings[1].color, 0);
+            }
         }
     }
 
@@ -1238,11 +1349,11 @@ void victory(boolean superVictory) {
     // First screen - Congratulations...
     //
     if (superVictory) {
-        message(    "Light streams through the portal, and you are teleported out of the dungeon.", 0);
+        message(    "Light streams through the portal, and you are teleported out of the Burrows.", 0);
         screenDisplayBuffer dbuf = displayBuffer;
         funkyFade(&dbuf, &superVictoryColor, 0, 240, mapToWindowX(player.loc.x), mapToWindowY(player.loc.y), false);
         displayMoreSign();
-        printString("Congratulations; you have transcended the Dungeons of Doom!                 ", mapToWindowX(0), mapToWindowY(-1), &black, &white, 0);
+        printString("Congratulations; you have transcended the Burrows of the Abomination!        ", mapToWindowX(0), mapToWindowY(-1), &black, &white, 0);
         displayMoreSign();
         clearDisplayBuffer(&dbuf);
         deleteMessages();
@@ -1252,7 +1363,7 @@ void victory(boolean superVictory) {
         screenDisplayBuffer dbuf = displayBuffer;
         funkyFade(&dbuf, &white, 0, 240, mapToWindowX(player.loc.x), mapToWindowY(player.loc.y), false);
         displayMoreSign();
-        printString("Congratulations; you have escaped from the Dungeons of Doom!     ", mapToWindowX(0), mapToWindowY(-1), &black, &white, 0);
+        printString("Congratulations; you have escaped from the Burrows of the Abomination! ", mapToWindowX(0), mapToWindowY(-1), &black, &white, 0);
         displayMoreSign();
         deleteMessages();
         strcpy(displayedMessage[0], "You sell your treasures and live out your days in fame and glory.");
@@ -1278,7 +1389,7 @@ void victory(boolean superVictory) {
         }
         if (theItem->category == AMULET && superVictory) {
             plotCharToBuffer(G_AMULET, (windowpos){ mapToWindowX(2), min(ROWS-1, i + 1) }, &yellow, &black, &dbuf);
-            printString("The Birthright of Yendor", mapToWindowX(4), min(ROWS-1, i + 1), &itemMessageColor, &black, &dbuf);
+            printString("The Banisher of the Abomination", mapToWindowX(4), min(ROWS-1, i + 1), &itemMessageColor, &black, &dbuf);
             sprintf(buf, "%li", max(0, itemValue(theItem) * 2));
             printString(buf, mapToWindowX(60), min(ROWS-1, i + 1), &itemMessageColor, &black, &dbuf);
             totalValue += max(0, itemValue(theItem) * 2);
@@ -1327,11 +1438,11 @@ void victory(boolean superVictory) {
 
     strcpy(victoryVerb, superVictory ? "Mastered" : "Escaped");
     if (gemCount == 0) {
-        sprintf(theEntry.description, "%s the Dungeons of Doom!", victoryVerb);
+        sprintf(theEntry.description, "%s the Burrows of the Abomination!", victoryVerb);
     } else if (gemCount == 1) {
-        sprintf(theEntry.description, "%s the Dungeons of Doom with a lumenstone!", victoryVerb);
+        sprintf(theEntry.description, "%s the Burrows of the Abomination with a lumenstone!", victoryVerb);
     } else {
-        sprintf(theEntry.description, "%s the Dungeons of Doom with %i lumenstones!", victoryVerb, gemCount);
+        sprintf(theEntry.description, "%s the Burrows of the Abomination with %i lumenstones!", victoryVerb, gemCount);
     }
 
     theEntry.score = totalValue;

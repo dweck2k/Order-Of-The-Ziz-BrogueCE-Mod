@@ -658,8 +658,82 @@ const meteredItemGenerationTable meteredItemsGenerationTable_RapidBrogue[] = {
 
 // levelFeelings[0] -> AMULET_LEVEL, levelFeelings[1] -> DEEPEST_LEVEL
 levelFeeling levelFeelings_RapidBrogue[] = {
-    { .message = "An alien energy permeates the area. The Amulet of Yendor must be nearby!", .color = &itemMessageColor },
+    { .message = "An alien energy permeates the area. The Book of the Abomination must be nearby!", .color = &itemMessageColor },
     { .message = "An overwhelming sense of peace and tranquility settles upon you... then you see monsters. Doh.", .color = &lightBlue }
+};
+
+// Checkpoint texts for story progression (depths: 1, 5, 10, 13, 16, 19, 22, 24, 26, -1 for ending)
+checkpointText checkpointTexts_RapidBrogue[] = {
+    {1, {
+        "The stone here is young. Too young to remember mercy. The earth opens without ceremony.",
+        "This entrance was not hidden. It was abandoned. No one seals a door they still believe in.",
+        "Dust settles as you step inside. The world above closes quietly behind you.",
+        "Symbols mark the walls — warnings rewritten as invitations.",
+        "You feel watched, but nothing looks back. Not yet."
+    }},
+    {5, {
+        "Scratches mark the walls. Not claws. Fingernails.",
+        "Names carved, erased, carved again. Someone cared to correct them.",
+        "The markings show hesitation, not panic.",
+        "Prayer and regret linger here in equal measure.",
+        "The Cult said others came before. Now you believe them."
+    }},
+    {10, {
+        "Melted candles stain the floor like old wounds.",
+        "This was a place of study. Fear came later.",
+        "Half-finished rituals. No one stayed to complete them.",
+        "Knowledge was tested here. Something failed.",
+        "The Abomination learned patience in this place."
+    }},
+    {13, {
+        "The burrow divides. Rot one way, ink the other.",
+        "Decay and record. Both lead down.",
+        "The stone itself hesitates here.",
+        "The Book leaves traces even where absent.",
+        "Choice without certainty. It always is."
+    }},
+    {16, {
+        "These were human once. Now they serve unknowingly.",
+        "Their prayers are familiar, only slightly twisted.",
+        "They believe they protect something sacred.",
+        "Corruption redirected them, not broke them.",
+        "The Cult warned: belief can be weaponized."
+    }},
+    {19, {
+        "Names press heavy against your thoughts.",
+        "The walls remember what tongues must not say.",
+        "Each name is a lever. You dare not pull all.",
+        "Knowledge accumulates like pressure here.",
+        "The Book was hidden for reasons beyond fear."
+    }},
+    {22, {
+        "Nothing moves. Nothing breathes.",
+        "The absence is deliberate.",
+        "An empty pedestal stands, accusing.",
+        "This room waits for what you carry.",
+        "The Abomination leaves nothing unattended."
+    }},
+    {24, {
+        "The stone here predates intention.",
+        "Law and heresy bind the seal together.",
+        "To take the Book interrupts something ancient.",
+        "The burrow tightens, aware of you.",
+        "Attention falls like weight."
+    }},
+    {26, {
+        "The Book is heavier than flesh should allow.",
+        "You feel marked the moment you touch it.",
+        "This is not victory. It is delay.",
+        "The Abomination does not scream. It remembers.",
+        "You carry consequence, not triumph."
+    }},
+    {-1, {
+        "You return to light thinner than before. The war continues elsewhere.",
+        "The Book is sealed — for now. That is enough.",
+        "You did not save the world. You corrected its course.",
+        "Somewhere below, the burrow reshapes itself.",
+        "The world remains unaware. This is success."
+    }}
 };
 
 itemTable potionTable_RapidBrogue[] = {
@@ -667,7 +741,7 @@ itemTable potionTable_RapidBrogue[] = {
     {"strength",            itemColors[2], "",  0,  400,    0, 0, {2,2,0}, false, false, 1,  false, "This powerful medicine will course through your muscles, permanently increasing your strength by one point."}, // frequency is dynamically adjusted
     {"telepathy",           itemColors[3], "",  20, 350,    0, 0, {50,50,0}, false, false, 1,  false, "This mysterious liquid will attune your mind to the psychic signature of distant creatures. Its effects will not reveal inanimate objects, such as totems, turrets and traps."},
     {"levitation",          itemColors[4], "",  15, 250,    0, 0, {75,75,0}, false, false, 1,  false, "This curious liquid will cause you to hover in the air, able to drift effortlessly over lava, water, chasms and traps. Flames, gases and spiderwebs fill the air, and cannot be bypassed while airborne. Creatures that dwell in water or mud will be unable to attack you while you levitate."},
-    {"detect magic",        itemColors[5], "",  20, 500,    0, 0, {0,0,0}, false, false, 1,  false, "This mysterious brew will sensitize your mind to the radiance of magic. Items imbued with helpful enchantments will be marked with a full sigil; items corrupted by curses or designed to bring misfortune upon the bearer will be marked with a hollow sigil. The Amulet of Yendor will be revealed by its unique aura."},
+    {"detect magic",        itemColors[5], "",  20, 500,    0, 0, {0,0,0}, false, false, 1,  false, "This mysterious brew will sensitize your mind to the radiance of magic. Items imbued with helpful enchantments will be marked with a full sigil; items corrupted by curses or designed to bring misfortune upon the bearer will be marked with a hollow sigil. The Book of the Abomination will be revealed by its unique aura."},
     {"speed",               itemColors[6], "",  10, 500,    0, 0, {25,25,0}, false, false, 1,  false, "Quaffing the contents of this flask will enable you to move at blinding speed for several minutes."},
     {"fire immunity",       itemColors[7], "",  15, 500,    0, 0, {75,75,0}, false, false, 1,  false, "This potion will render you impervious to heat and permit you to wander through fire and lava and ignore otherwise deadly bolts of flame. It will not guard against the concussive impact of an explosion, however."},
     {"invisibility",        itemColors[8], "",  15, 400,    0, 0, {50,50,0}, false, false, 1,  false, "Drinking this potion will render you temporarily invisible. Enemies more than two spaces away will be unable to track you."},
@@ -949,32 +1023,33 @@ const hordeType hordeCatalog_RapidBrogue[] = {
 };
 
 const char *mainMenuTitle_RapidBrogue =
-"                ######   #####  ######  ## ######                   \
-                ##   ## ##   ## ##   ## ## ##   ##                  \
-                ######  ####### ######  ## ##   ##                  \
-                ##   ## ##   ## ##      ## ##   ##                  \
-                ##   ## ##   ## ##      ## ######                   \
+"                                                                    \
+       (*)  (*)  (*)    (*)    (*)  (*)  (*)                        \
+        |    |    |      |      |    |    |                         \
+        |    |    |     /+\\     |    |    |                         \
+        |    |    |    / | \\    |    |    |                         \
+        |    |    +---+  |  +---+    |    |                         \
+        |    |   /       |       \\   |    |                         \
+        |    +--+        |        +--+    |                         \
+        |   /            |            \\   |                         \
+        +--+             |             +--+                         \
+       /                 |                 \\                        \
+      +                  |                  +                       \
+       \\                 |                 /                        \
+        +------+         |         +------+                         \
+               |         |         |                                \
+               +---------+---------+                                \
+                         |                                          \
+                        /_\\                                         \
+                       / * \\                                        \
+                      +-----+                                       \
+                 +----+---------+----+                              \
+                 +###################+                              \
                                                                     \
-                                                                    \
-########  ########      ######         ######  ####    ### #########\
- ##   ###  ##   ###   ##     ###     ##     ##  ##      #   ##     #\
- ##    ##  ##    ##  ##       ###   ##       #  ##      #   ##     #\
- ##    ##  ##    ##  #    #    ##   #        #  ##      #   ##      \
- ##    ##  ##    ## ##   ##     ## ##           ##      #   ##    # \
- ##   ##   ##   ##  ##   ###    ## ##           ##      #   ##    # \
- ######    ## ###   ##   ####   ## ##           ##      #   ####### \
- ##    ##  ##  ##   ##   ####   ## ##           ##      #   ##    # \
- ##     ## ##   ##  ##    ###   ## ##     ##### ##      #   ##    # \
- ##     ## ##   ##  ###    ##   ## ###      ##  ##      #   ##      \
- ##     ## ##    ##  ##    #    #   ##      ##  ##      #   ##      \
- ##     ## ##    ##  ###       ##   ###     ##  ###     #   ##     #\
- ##    ##  ##     ##  ###     ##     ###   ###   ###   #    ##     #\
-########  ####    ###   ######         ####       #####    #########\
-                          ##                                        \
-                      ##########                                    \
-                          ##                                        \
-                          ##                                        \
-                         ####                                       ";
+             ###  #  #  #     ###                                   \
+            #     #  #  #      #                                    \
+            #     #  #  #      #      ###  ###                      \
+             ###  ####  ####   #     #  #  ###    ####  ####  ####  ";
 
 #define RAPID_BROGUE_MAJOR 1
 #define RAPID_BROGUE_MINOR 6
@@ -1093,4 +1168,5 @@ void initializeGameVariantRapidBrogue() {
 
     mainMenuTitle = mainMenuTitle_RapidBrogue;
     levelFeelings = levelFeelings_RapidBrogue;
+    checkpointTexts = checkpointTexts_RapidBrogue;
 }

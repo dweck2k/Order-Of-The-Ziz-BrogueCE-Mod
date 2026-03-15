@@ -882,7 +882,7 @@ void pickUpItemAt(pos loc) {
         }
 
         if ((theItem->category & AMULET) && numberOfMatchingPackItems(AMULET, 0, 0, false)) {
-            message("you already have the Amulet of Yendor.", 0);
+            message("you already have the Book of the Abomination.", 0);
             deleteItem(theItem);
             return;
         }
@@ -1421,7 +1421,7 @@ void call(item *theItem) {
 // IncludeDetails governs things such as enchantment, charges, strength requirement, times used, etc.
 // IncludeArticle governs the article -- e.g. "some" food, "5" darts, "a" pink potion.
 // If baseColor is provided, then the suffix will be in gray, flavor portions of the item name (e.g. a "pink" potion,
-//  a "sandalwood" staff, a "ruby" ring) will be in dark purple, and the Amulet of Yendor and lumenstones will be in yellow.
+//  a "sandalwood" staff, a "ruby" signet) will be in dark purple, and the Book of the Abomination and lumenstones will be in yellow.
 //  BaseColor itself will be the color that the name reverts to outside of these colored portions.
 void itemName(item *theItem, char *root, boolean includeDetails, boolean includeArticle, const color *baseColor) {
     char buf[DCOLS * 5], pluralization[10], article[10] = "", runicName[30],
@@ -1523,15 +1523,15 @@ void itemName(item *theItem, char *root, boolean includeDetails, boolean include
             break;
         case SCROLL:
             if (scrollTable[theItem->kind].identified || rogue.playbackOmniscience) {
-                sprintf(root, "scroll%s of %s", pluralization, scrollTable[theItem->kind].name);
+                sprintf(root, "Piyut%s of %s", pluralization, scrollTable[theItem->kind].name);
             } else if (scrollTable[theItem->kind].called) {
-                sprintf(root, "scroll%s called %s%s%s",
+                sprintf(root, "Piyut%s called %s%s%s",
                         pluralization,
                         purpleEscapeSequence,
                         scrollTable[theItem->kind].callTitle,
                         baseEscapeSequence);
             } else {
-                sprintf(root, "scroll%s entitled %s\"%s\"%s",
+                sprintf(root, "Piyut%s entitled %s\"%s\"%s",
                         pluralization,
                         purpleEscapeSequence,
                         scrollTable[theItem->kind].flavor,
@@ -1540,15 +1540,15 @@ void itemName(item *theItem, char *root, boolean includeDetails, boolean include
             break;
         case POTION:
             if (potionTable[theItem->kind].identified || rogue.playbackOmniscience) {
-                sprintf(root, "potion%s of %s", pluralization, potionTable[theItem->kind].name);
+                sprintf(root, "Segulah Flask%s of %s", pluralization, potionTable[theItem->kind].name);
             } else if (potionTable[theItem->kind].called) {
-                sprintf(root, "potion%s called %s%s%s",
+                sprintf(root, "Segulah Flask%s called %s%s%s",
                         pluralization,
                         purpleEscapeSequence,
                         potionTable[theItem->kind].callTitle,
                         baseEscapeSequence);
             } else {
-                sprintf(root, "%s%s%s potion%s",
+                sprintf(root, "%s%s%s Segulah Flask%s",
                         purpleEscapeSequence,
                         potionTable[theItem->kind].flavor,
                         baseEscapeSequence,
@@ -1557,17 +1557,17 @@ void itemName(item *theItem, char *root, boolean includeDetails, boolean include
             break;
         case WAND:
             if (wandTable[theItem->kind].identified || rogue.playbackOmniscience) {
-                sprintf(root, "wand%s of %s",
+                sprintf(root, "rod%s of %s",
                         pluralization,
                         wandTable[theItem->kind].name);
             } else if (wandTable[theItem->kind].called) {
-                sprintf(root, "wand%s called %s%s%s",
+                sprintf(root, "rod%s called %s%s%s",
                         pluralization,
                         purpleEscapeSequence,
                         wandTable[theItem->kind].callTitle,
                         baseEscapeSequence);
             } else {
-                sprintf(root, "%s%s%s wand%s",
+                sprintf(root, "%s%s%s rod%s",
                         purpleEscapeSequence,
                         wandTable[theItem->kind].flavor,
                         baseEscapeSequence,
@@ -1623,15 +1623,15 @@ void itemName(item *theItem, char *root, boolean includeDetails, boolean include
             break;
         case RING:
             if (ringTable[theItem->kind].identified || rogue.playbackOmniscience) {
-                sprintf(root, "ring%s of %s", pluralization, ringTable[theItem->kind].name);
+                sprintf(root, "signet%s of %s", pluralization, ringTable[theItem->kind].name);
             } else if (ringTable[theItem->kind].called) {
-                sprintf(root, "ring%s called %s%s%s",
+                sprintf(root, "signet%s called %s%s%s",
                         pluralization,
                         purpleEscapeSequence,
                         ringTable[theItem->kind].callTitle,
                         baseEscapeSequence);
             } else {
-                sprintf(root, "%s%s%s ring%s",
+                sprintf(root, "%s%s%s signet%s",
                         purpleEscapeSequence,
                         ringTable[theItem->kind].flavor,
                         baseEscapeSequence,
@@ -1643,7 +1643,7 @@ void itemName(item *theItem, char *root, boolean includeDetails, boolean include
             }
             break;
         case CHARM:
-            sprintf(root, "%s charm%s", charmTable[theItem->kind].name, pluralization);
+            sprintf(root, "%s of %s", (theItem->quantity > 1 ? "Kameot" : "Kameah"), charmTable[theItem->kind].name);
 
             if (includeDetails) {
                 sprintf(buf, "%s%i %s", (theItem->enchant1 < 0 ? "" : "+"), theItem->enchant1, root);
@@ -1665,7 +1665,7 @@ void itemName(item *theItem, char *root, boolean includeDetails, boolean include
             sprintf(root, "gold piece%s", pluralization);
             break;
         case AMULET:
-            sprintf(root, "%sAmulet%s of Yendor%s", yellowEscapeSequence, pluralization, baseEscapeSequence);
+            sprintf(root, "%sBook%s of the Abomination%s", yellowEscapeSequence, pluralization, baseEscapeSequence);
             break;
         case GEM:
             sprintf(root, "%slumenstone%s%s from depth %i", yellowEscapeSequence, pluralization, baseEscapeSequence, theItem->originDepth);
@@ -1729,7 +1729,7 @@ void itemKindName(item *theItem, char *kindName) {
                 strcpy(kindName, "gold pieces");
                 break;
             case AMULET:
-                strcpy(kindName, "amulet of yendor");
+                strcpy(kindName, "Book of the Abomination");
                 break;
             case GEM:
                 strcpy(kindName, "lumenstone");
@@ -1970,7 +1970,7 @@ void itemDetails(char *buf, item *theItem) {
                 strcat(buf2, "What a perplexing charm!");
                 break;
             case AMULET:
-                strcpy(buf2, "Legends are told about this mysterious golden amulet, and legions of adventurers have perished in its pursuit. Unfathomable riches await anyone with the skill and ambition to carry it into the light of day.");
+                strcpy(buf2, "The pages of this ancient tome pulse with a dark, living energy. The Book of the Abomination contains the designs and hungers of a force that has worked against creation since before memory. Generations of the Cult have sought it. To carry it into the light is to begin the work of Tikkun.");
                 break;
             case GEM:
                 sprintf(buf2, "Faint golden lights swirl and fluoresce beneath the stone%s surface. Lumenstones are said to contain mysterious properties of untold power, but for you, they mean one thing: riches.",
@@ -4032,7 +4032,7 @@ static void rechargeItems(unsigned long categories) {
             }
         }
         if (z) {
-            strcat(buf, z == 1 ? "charm" : "charms");
+            strcat(buf, z == 1 ? "Kameah" : "Kameot");
         }
         strcat(buf, ".");
         message(buf, 0);

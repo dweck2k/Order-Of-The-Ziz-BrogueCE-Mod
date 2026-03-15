@@ -1465,6 +1465,11 @@ typedef struct levelFeeling {
     const color *color;
 } levelFeeling;
 
+typedef struct checkpointText {
+    short depth;                    // Level number (1, 5, 10, 13, 16, 19, 22, 24, 26, -1 for ending)
+    const char *variants[5];        // 5 text variants (A-E)
+} checkpointText;
+
 enum dungeonFeatureTypes {
     DF_GRANITE_COLUMN = 1,
     DF_CRYSTAL_WALL,
