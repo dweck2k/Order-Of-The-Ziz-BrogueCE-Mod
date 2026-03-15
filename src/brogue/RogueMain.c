@@ -278,7 +278,7 @@ void initializeGameVariant() {
 void initializeRogue(uint64_t seed) {
     short i, j, k;
     item *theItem;
-    boolean playingback, playbackFF, playbackPaused, wizard, easy, displayStealthRangeMode;
+    boolean playingback, playbackFF, playbackPaused, mode, easy, displayStealthRangeMode;
     boolean trueColorMode;
     boolean hideSeed;
     short oldRNG;
@@ -287,9 +287,8 @@ void initializeRogue(uint64_t seed) {
     playingback = rogue.playbackMode; // the only animals that need to go on the ark
     playbackPaused = rogue.playbackPaused;
     playbackFF = rogue.playbackFastForward;
-    wizard = rogue.wizard;
+    mode = rogue.mode;
     hideSeed = rogue.hideSeed;
-    easy = rogue.easyMode;
     displayStealthRangeMode = rogue.displayStealthRangeMode;
     trueColorMode = rogue.trueColorMode;
 
@@ -303,9 +302,8 @@ void initializeRogue(uint64_t seed) {
     rogue.playbackMode = playingback;
     rogue.playbackPaused = playbackPaused;
     rogue.playbackFastForward = playbackFF;
-    rogue.wizard = wizard;
+    rogue.mode = mode;
     rogue.hideSeed = hideSeed;
-    rogue.easyMode = easy;
     rogue.displayStealthRangeMode = displayStealthRangeMode;
     rogue.trueColorMode = trueColorMode;
 
@@ -1261,7 +1259,7 @@ void gameOver(char *killedBy, boolean useCustomPhrasing) {
     rogue.gold += 500 * numGems;
     theEntry.score = rogue.gold;
 
-    if (rogue.easyMode) {
+    if (rogue.mode == GAME_MODE_EASY) {
         theEntry.score /= 10;
     }
     strcpy(highScoreText, buf);
@@ -1319,7 +1317,7 @@ void gameOver(char *killedBy, boolean useCustomPhrasing) {
         notifyEvent(GAMEOVER_RECORDING, 0, 0, "recording ended", "none");
     }
 
-    if (!rogue.playbackMode && !rogue.easyMode && !rogue.wizard) {
+    if (!rogue.playbackMode && rogue.mode != GAME_MODE_EASY &&  rogue.mode != GAME_MODE_WIZARD) {
         saveRunHistory(rogue.quit ? "Quit" : "Died", rogue.quit ? "-" : killedBy, (int) theEntry.score, numGems);
     }
 
@@ -1447,11 +1445,11 @@ void victory(boolean superVictory) {
 
     theEntry.score = totalValue;
 
-    if (rogue.easyMode) {
+    if (rogue.mode == GAME_MODE_EASY) {
         theEntry.score /= 10;
     }
 
-    if (!rogue.wizard && !rogue.playbackMode) {
+    if (!rogue.mode == GAME_MODE_WIZARD && !rogue.playbackMode) {
         qualified = saveHighScore(theEntry);
     } else {
         qualified = false;
@@ -1485,7 +1483,7 @@ void victory(boolean superVictory) {
         notifyEvent(GAMEOVER_RECORDING, 0, 0, "recording ended", "none");
     }
 
-    if (!rogue.playbackMode && !rogue.easyMode && !rogue.wizard) {
+    if (!rogue.playbackMode && rogue.mode != GAME_MODE_EASY && rogue.mode != GAME_MODE_NORMAL) {
         saveRunHistory(victoryVerb, "-", (int) theEntry.score, gemCount);
     }
 
@@ -1494,7 +1492,7 @@ void victory(boolean superVictory) {
 }
 
 void enableEasyMode() {
-    if (rogue.easyMode) {
+    if (rogue.mode == GAME_MODE_EASY) {
         message("Alas, all hope of salvation is lost. You shed scalding tears at your plight.", 0);
         return;
     }
@@ -1502,7 +1500,7 @@ void enableEasyMode() {
     if (confirm("Succumb to demonic temptation (i.e. enable Easy Mode)?", false)) {
         recordKeystroke(EASY_MODE_KEY, false, true);
         message("An ancient and terrible evil burrows into your willing flesh!", REQUIRE_ACKNOWLEDGMENT);
-        rogue.easyMode = true;
+        rogue.mode == GAME_MODE_EASY;
         setPlayerDisplayChar();
         refreshDungeonCell(player.loc);
         refreshSideBar(-1, -1, false);
