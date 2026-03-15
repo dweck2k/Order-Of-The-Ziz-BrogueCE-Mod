@@ -19,3 +19,4 @@ BrogueCE-*
 *.desktop
 gmon.out
 "*.patch" 
+wordpress-theme/ 
