@@ -1,0 +1,96 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  id-token: write   # required by SignPath
+  contents: write   # required to create GitHub Release
+
+jobs:
+  build-and-sign-windows:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: .\.github\get-deps-mingw.ps1
+
+      - name: Compile
+        shell: powershell
+        run: |
+          $env:path = $env:path + ";" + (Join-Path $pwd.Drive.Root "opt/local/x86_64-w64-mingw32/bin")
+          mingw32-make `
+            SDL_CONFIG='sdl2-config --prefix=/opt/local/x86_64-w64-mingw32' `
+            SYSTEM=WINDOWS CC=gcc bin/brogue.exe
+
+      - name: Rename binary
+        run: copy bin\brogue.exe bin\OrderOfTheZiz.exe
+
+      - name: Upload unsigned EXE for signing
+        id: unsigned
+        uses: actions/upload-artifact@v4
+        with:
+          name: unsigned-exe
+          path: bin/OrderOfTheZiz.exe
+
+      - name: Sign with SignPath Foundation
+        id: signing
+        uses: signpath/github-action-submit-signing-request@v1
+        with:
+          api-token: '${{ secrets.SIGNPATH_API_TOKEN }}'
+          organization-id: '${{ vars.SIGNPATH_ORGANIZATION_ID }}'
+          project-slug: 'order-of-the-ziz'
+          signing-policy-slug: 'release-signing'
+          artifact-configuration-slug: 'single-exe'
+          github-artifact-id: '${{ steps.unsigned.outputs.artifact-id }}'
+          wait-for-completion: true
+          output-artifact-directory: signed/
+
+      - name: Assemble release folder
+        shell: powershell
+        run: |
+          New-Item -ItemType Directory -Path release | Out-Null
+          # Signed EXE
+          Copy-Item signed\OrderOfTheZiz.exe release\
+          # Batch launcher
+          Copy-Item bin\OrderOfTheZiz-cmd.bat release\
+          # SDL2 DLLs from mingw install
+          $sdlBin = "C:\opt\local\x86_64-w64-mingw32\bin"
+          $dlls = @("SDL2.dll","SDL2_image.dll",
+                    "libjpeg-8.dll","libpng16-16.dll","zlib1.dll",
+                    "libtiff-6.dll","libwebp-7.dll","libwebpdemux-2.dll",
+                    "libgcc_s_seh-1.dll","libstdc++-6.dll","libwinpthread-1.dll")
+          foreach ($dll in $dlls) {
+            $src = Join-Path $sdlBin $dll
+            if (Test-Path $src) { Copy-Item $src release\ }
+          }
+          # Keymap
+          if (Test-Path bin\keymap.txt) { Copy-Item bin\keymap.txt release\ }
+          # Assets
+          if (Test-Path bin\assets) { Copy-Item -Recurse bin\assets release\assets }
+
+      - name: Create ZIP
+        run: 7z a OrderOfTheZiz-windows-${{ github.ref_name }}.zip .\release\*
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: "מסדר הזיז — ${{ github.ref_name }}"
+          body: |
+            ## Order of the Ziz — ${{ github.ref_name }}
+
+            A Jewish apocalyptic roguelike mod of BrogueCE.
+
+            ### Download
+            Extract the ZIP and run `OrderOfTheZiz.exe`.
+            No installation needed.
+
+            ### Changes
+            See [CHANGELOG](https://github.com/${{ github.repository }}/commits/main) for details.
+          files: OrderOfTheZiz-windows-${{ github.ref_name }}.zip
+          draft: false
+          prerelease: ${{ contains(github.ref_name, 'beta') || contains(github.ref_name, 'rc') }}
