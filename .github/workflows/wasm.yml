@@ -46,6 +46,7 @@ jobs:
           -DBROGUE_SDL \
           -DDATADIR=. \
           -DRELEASE \
+          -DBROGUE_EXTRA_VERSION= \
           -sUSE_SDL=2 \
           -sUSE_SDL_IMAGE=2 \
           "-sSDL2_IMAGE_FORMATS=[\"png\"]" \
