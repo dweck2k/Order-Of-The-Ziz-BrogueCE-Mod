@@ -51,8 +51,7 @@ jobs:
           -sUSE_SDL_IMAGE=2 \
           "-sSDL2_IMAGE_FORMATS=[\"png\"]" \
           -sASYNCIFY \
-          -sASYNCIFY_STACK_SIZE=65536 \
-          -sEMULATE_FUNCTION_POINTER_CASTS=1 \
+          -sASYNCIFY_STACK_SIZE=1048576 \
           -sALLOW_MEMORY_GROWTH=1 \
           -sINITIAL_MEMORY=67108864 \
           -sEXIT_RUNTIME=1 \
