@@ -51,6 +51,7 @@ jobs:
           -sUSE_SDL_IMAGE=2 \
           "-sSDL2_IMAGE_FORMATS=[\"png\"]" \
           -sJSPI \
+          -sSUPPORT_LONGJMP=wasm \
           -sALLOW_MEMORY_GROWTH=1 \
           -sINITIAL_MEMORY=67108864 \
           -sEXIT_RUNTIME=1 \
