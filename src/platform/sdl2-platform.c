@@ -460,6 +460,14 @@ boolean sdl_takeScreenshot_direct(void) { return _takeScreenshot(); }
 void sdl_remap_direct(const char *from, const char *to) { _remap(from, to); }
 #endif
 
+#ifdef __EMSCRIPTEN__
+// For WASM builds, NULL out function pointers to prevent async functions
+// from being placed in the WASM function table (which causes issues with
+// call_indirect). All calls go through direct wrappers instead.
+struct brogueConsole sdlConsole = {
+    NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL
+};
+#else
 struct brogueConsole sdlConsole = {
     _gameLoop,
     _pauseForMilliseconds,
@@ -471,3 +479,4 @@ struct brogueConsole sdlConsole = {
     _takeScreenshot,
     _setGraphicsMode
 };
+#endif

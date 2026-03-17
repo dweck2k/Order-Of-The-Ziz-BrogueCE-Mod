@@ -344,7 +344,11 @@ int main(int argc, char *argv[])
         return 1;
     }
 
+#ifdef __EMSCRIPTEN__
+    hasGraphics = true;  // SDL always has graphics; struct is NULLed for WASM
+#else
     hasGraphics = (currentConsole.setGraphicsMode != NULL);
+#endif
     // Now actually set graphics. We do this to ensure there is exactly one
     // call, whether true or false
     graphicsMode = setGraphicsMode(initialGraphics);

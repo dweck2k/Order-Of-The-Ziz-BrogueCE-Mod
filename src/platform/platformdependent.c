@@ -269,9 +269,14 @@ boolean pauseForMilliseconds(short milliseconds, PauseBehavior behavior) {
 }
 
 void notifyEvent(short eventId, int data1, int data2, const char *str1, const char *str2) {
+#ifdef __EMSCRIPTEN__
+    // notifyEvent is NULL for SDL console, nothing to do
+    (void)eventId; (void)data1; (void)data2; (void)str1; (void)str2;
+#else
     if (currentConsole.notifyEvent) {
         currentConsole.notifyEvent(eventId, data1, data2, str1, str2);
     }
+#endif
 }
 
 boolean takeScreenshot() {
