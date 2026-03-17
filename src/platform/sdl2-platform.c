@@ -2,6 +2,10 @@
 #include <unistd.h>
 #endif
 
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#endif
+
 #include <limits.h>
 #include <SDL_image.h>
 #include "platform.h"
@@ -291,7 +295,11 @@ static void _delayUpTo(short ms) {
     ms -= timeDiff;
 
     if (ms > 0) {
+#ifdef __EMSCRIPTEN__
+        emscripten_sleep((unsigned int)ms);
+#else
         SDL_Delay(ms);
+#endif
     } // else delaying further would go past the time we want to delay until
 
     lastDelayTime = SDL_GetTicks();
