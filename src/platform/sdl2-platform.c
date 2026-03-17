@@ -449,6 +449,15 @@ static enum graphicsModes _setGraphicsMode(enum graphicsModes mode) {
 void sdl_gameLoop_direct(void) { _gameLoop(); }
 void sdl_nextKeyOrMouseEvent_direct(rogueEvent *r, boolean t, boolean c) { _nextKeyOrMouseEvent(r, t, c); }
 boolean sdl_pauseForMilliseconds_direct(short ms, PauseBehavior b) { return _pauseForMilliseconds(ms, b); }
+void sdl_plotChar_direct(enum displayGlyph inputChar, short x, short y,
+    short foreRed, short foreGreen, short foreBlue,
+    short backRed, short backGreen, short backBlue) {
+    _plotChar(inputChar, x, y, foreRed, foreGreen, foreBlue, backRed, backGreen, backBlue);
+}
+boolean sdl_modifierHeld_direct(int mod) { return _modifierHeld(mod); }
+enum graphicsModes sdl_setGraphicsMode_direct(enum graphicsModes mode) { return _setGraphicsMode(mode); }
+boolean sdl_takeScreenshot_direct(void) { return _takeScreenshot(); }
+void sdl_remap_direct(const char *from, const char *to) { _remap(from, to); }
 #endif
 
 struct brogueConsole sdlConsole = {

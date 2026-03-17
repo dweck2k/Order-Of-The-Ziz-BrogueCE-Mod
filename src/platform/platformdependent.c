@@ -225,14 +225,29 @@ void plotChar(enum displayGlyph inputChar,
               short xLoc, short yLoc,
               short foreRed, short foreGreen, short foreBlue,
               short backRed, short backGreen, short backBlue) {
+#ifdef __EMSCRIPTEN__
+    extern void sdl_plotChar_direct(enum displayGlyph, short, short, short, short, short, short, short, short);
+    sdl_plotChar_direct(inputChar, xLoc, yLoc, foreRed, foreGreen, foreBlue, backRed, backGreen, backBlue);
+#else
     currentConsole.plotChar(inputChar, xLoc, yLoc, foreRed, foreGreen, foreBlue, backRed, backGreen, backBlue);
+#endif
 }
 
 boolean shiftKeyIsDown() {
+#ifdef __EMSCRIPTEN__
+    extern boolean sdl_modifierHeld_direct(int);
+    return sdl_modifierHeld_direct(0);
+#else
     return currentConsole.modifierHeld(0);
+#endif
 }
 boolean controlKeyIsDown() {
+#ifdef __EMSCRIPTEN__
+    extern boolean sdl_modifierHeld_direct(int);
+    return sdl_modifierHeld_direct(1);
+#else
     return currentConsole.modifierHeld(1);
+#endif
 }
 
 void nextKeyOrMouseEvent(rogueEvent *returnEvent, boolean textInput, boolean colorsDance) {
@@ -260,19 +275,29 @@ void notifyEvent(short eventId, int data1, int data2, const char *str1, const ch
 }
 
 boolean takeScreenshot() {
+#ifdef __EMSCRIPTEN__
+    extern boolean sdl_takeScreenshot_direct(void);
+    return sdl_takeScreenshot_direct();
+#else
     if (currentConsole.takeScreenshot) {
         return currentConsole.takeScreenshot();
     } else {
         return false;
     }
+#endif
 }
 
 enum graphicsModes setGraphicsMode(enum graphicsModes mode) {
+#ifdef __EMSCRIPTEN__
+    extern enum graphicsModes sdl_setGraphicsMode_direct(enum graphicsModes);
+    return sdl_setGraphicsMode_direct(mode);
+#else
     if (currentConsole.setGraphicsMode) {
         return currentConsole.setGraphicsMode(mode);
     } else {
         return TEXT_GRAPHICS;
     }
+#endif
 }
 
 // creates an empty high scores file
@@ -397,9 +422,14 @@ void loadKeymap() {
             if (input_name != NULL && output_name != NULL) {
                 if (input_name[0] == '#') continue; // must be a comment
 
+#ifdef __EMSCRIPTEN__
+                extern void sdl_remap_direct(const char*, const char*);
+                sdl_remap_direct(input_name, output_name);
+#else
                 if (currentConsole.remap) {
                     currentConsole.remap(input_name, output_name);
                 }
+#endif
             }
         }
         fclose(f);
