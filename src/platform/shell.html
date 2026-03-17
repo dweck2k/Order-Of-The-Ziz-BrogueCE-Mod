@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Order Of The Ziz</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #0a0a0a;
+      color: #c8a84b;
+      font-family: 'Courier New', Courier, monospace;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 16px;
+    }
+
+    header {
+      text-align: center;
+      padding: 16px 0 12px;
+      letter-spacing: 0.05em;
+    }
+
+    header h1 {
+      font-size: 1.5rem;
+      color: #e8c55b;
+      text-shadow: 0 0 16px #b8922a88;
+      margin-bottom: 4px;
+    }
+
+    header p {
+      font-size: 0.75rem;
+      color: #7a6030;
+    }
+
+    #canvas-container {
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      max-width: 960px;
+    }
+
+    canvas {
+      display: block;
+      border: 1px solid #2a2010;
+      background: #000;
+      /* Emscripten will set width/height programmatically */
+    }
+
+    canvas:focus { outline: none; }
+
+    #loading-overlay {
+      position: absolute;
+      inset: 0;
+      background: #000;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      transition: opacity 0.4s;
+    }
+
+    #loading-overlay.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .loading-title {
+      font-size: 1.1rem;
+      color: #c8a84b;
+    }
+
+    .progress-bar-bg {
+      width: 280px;
+      height: 6px;
+      background: #1a1508;
+      border: 1px solid #3a2a10;
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #8a6020, #e8c55b);
+      border-radius: 3px;
+      transition: width 0.2s ease;
+    }
+
+    #status-text {
+      font-size: 0.7rem;
+      color: #5a4820;
+      min-height: 1em;
+      text-align: center;
+    }
+
+    #error-message {
+      display: none;
+      color: #c84b4b;
+      font-size: 0.8rem;
+      max-width: 400px;
+      text-align: center;
+      padding: 12px;
+      border: 1px solid #5a2020;
+      background: #1a0808;
+    }
+
+    footer {
+      padding: 12px 0;
+      font-size: 0.65rem;
+      color: #3a2a10;
+      text-align: center;
+    }
+
+    footer a { color: #5a4820; text-decoration: none; }
+    footer a:hover { color: #c8a84b; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Order Of The Ziz</h1>
+    <p>a Jewish roguelike &bull; &#x05DE;&#x05E9;&#x05D7;&#x05E7; &#x05E8;&#x05D5;&#x05D2;&#x05DC;&#x05D9;&#x05E7; &#x05D9;&#x05D4;&#x05D5;&#x05D3;&#x05D9;</p>
+  </header>
+
+  <div id="canvas-container">
+    <canvas id="canvas" tabindex="0" oncontextmenu="event.preventDefault()"></canvas>
+    <div id="loading-overlay">
+      <div class="loading-title">&#x05D8;&#x05D5;&#x05E2;&#x05DF;&#x2026; Loading&hellip;</div>
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill" id="progress-fill"></div>
+      </div>
+      <div id="status-text"></div>
+      <div id="error-message"></div>
+    </div>
+  </div>
+
+  <footer>
+    based on <a href="https://github.com/tmewett/BrogueCE" target="_blank">BrogueCE</a>
+    &bull; <a href="https://github.com/dweck2k/BrogueCE-Jewish" target="_blank">source</a>
+  </footer>
+
+  <script type="text/javascript">
+    var statusElement   = document.getElementById('status-text');
+    var progressFill    = document.getElementById('progress-fill');
+    var loadingOverlay  = document.getElementById('loading-overlay');
+    var errorMessage    = document.getElementById('error-message');
+
+    var totalDeps = 0;
+
+    var Module = {
+      canvas: (function() {
+        var canvas = document.getElementById('canvas');
+        canvas.addEventListener('webglcontextlost', function(e) {
+          alert('WebGL context lost — please reload the page.');
+          e.preventDefault();
+        }, false);
+        return canvas;
+      })(),
+
+      setStatus: function(text) {
+        if (!Module.setStatus.last) Module.setStatus.last = { time: Date.now(), text: '' };
+        if (text === Module.setStatus.last.text) return;
+        Module.setStatus.last.text = text;
+
+        if (text) {
+          statusElement.textContent = text;
+        } else {
+          // Loading complete — hide overlay
+          loadingOverlay.classList.add('hidden');
+          setTimeout(function() { loadingOverlay.style.display = 'none'; }, 400);
+          document.getElementById('canvas').focus();
+        }
+      },
+
+      monitorRunDependencies: function(left) {
+        totalDeps = Math.max(totalDeps, left);
+        if (totalDeps > 0) {
+          var pct = Math.round((totalDeps - left) / totalDeps * 100);
+          progressFill.style.width = pct + '%';
+        }
+      },
+
+      onAbort: function(what) {
+        errorMessage.style.display = 'block';
+        errorMessage.textContent = 'Error: ' + what;
+        loadingOverlay.classList.remove('hidden');
+        loadingOverlay.style.display = 'flex';
+      },
+
+      print: function(text) {
+        if (arguments.length > 1) text = Array.prototype.slice.call(arguments).join(' ');
+        console.log(text);
+      },
+
+      printErr: function(text) {
+        if (arguments.length > 1) text = Array.prototype.slice.call(arguments).join(' ');
+        console.error(text);
+      }
+    };
+
+    window.onerror = function(message) {
+      errorMessage.style.display = 'block';
+      errorMessage.textContent = 'JavaScript error: ' + message;
+    };
+  </script>
+
+  {{{ SCRIPT }}}
+
+</body>
+</html>

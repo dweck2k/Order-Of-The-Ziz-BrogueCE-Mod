@@ -1,0 +1,79 @@
+name: "WASM Build & Deploy"
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+
+  build-wasm:
+    runs-on: ubuntu-latest
+    steps:
+
+    - name: "Checkout"
+      uses: actions/checkout@v4
+
+    - name: "Setup Emscripten"
+      uses: mymindstorm/setup-emsdk@v14
+      with:
+        version: "3.1.68"
+        actions-cache-folder: "emsdk-cache"
+
+    - name: "Build WASM"
+      run: |
+        mkdir -p web
+        emcc \
+          src/brogue/*.c \
+          src/variants/*.c \
+          src/platform/main.c \
+          src/platform/platformdependent.c \
+          src/platform/null-platform.c \
+          src/platform/sdl2-platform.c \
+          src/platform/tiles.c \
+          -Isrc/brogue -Isrc/platform -Isrc/variants \
+          -std=c99 -O2 \
+          -Wall -Wno-parentheses -Wno-unused-result -Wformat \
+          -DBROGUE_SDL \
+          -DDATADIR=. \
+          -DRELEASE \
+          -sUSE_SDL=2 \
+          -sUSE_SDL_IMAGE=2 \
+          "-sSDL2_IMAGE_FORMATS=[\"png\"]" \
+          -sASYNCIFY \
+          -sASYNCIFY_STACK_SIZE=65536 \
+          -sALLOW_MEMORY_GROWTH=1 \
+          -sINITIAL_MEMORY=67108864 \
+          -sFORCED_EXITS=1 \
+          -sEXIT_RUNTIME=1 \
+          --preload-file bin/assets@assets \
+          --shell-file src/platform/shell.html \
+          -o web/brogue.html
+
+    - name: "Setup Pages"
+      uses: actions/configure-pages@v5
+
+    - name: "Upload Pages artifact"
+      uses: actions/upload-pages-artifact@v3
+      with:
+        path: web/
+
+  deploy:
+    needs: build-wasm
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+    - name: "Deploy to GitHub Pages"
+      id: deployment
+      uses: actions/deploy-pages@v4
