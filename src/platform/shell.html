@@ -8,47 +8,55 @@
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      background: #0a0a0a;
+      background: #080808;
       color: #c8a84b;
       font-family: 'Courier New', Courier, monospace;
       display: flex;
       flex-direction: column;
       align-items: center;
       min-height: 100vh;
-      padding: 16px;
+      padding: 12px 8px;
     }
 
     header {
       text-align: center;
-      padding: 14px 0 10px;
-      letter-spacing: 0.05em;
+      padding: 10px 0 8px;
+      letter-spacing: 0.04em;
     }
 
     header h1 {
-      font-size: 1.5rem;
+      font-size: 1.6rem;
       color: #e8c55b;
-      text-shadow: 0 0 20px #c8a84b66;
-      margin-bottom: 4px;
+      text-shadow: 0 0 24px #c8a84b55;
+      margin-bottom: 6px;
+      letter-spacing: 0.1em;
     }
 
     header p {
-      font-size: 0.72rem;
+      font-size: 0.8rem;
       color: #7a6030;
+      font-style: italic;
+      direction: rtl;
     }
 
+    /* ── Canvas area ── */
     #canvas-container {
       position: relative;
       display: flex;
       justify-content: center;
-      align-items: center;
+      align-items: flex-start;
       width: 100%;
-      max-width: 960px;
+      max-width: 1400px;
     }
 
     canvas {
       display: block;
-      border: 1px solid #2a2010;
+      border: 1px solid #1e1808;
       background: #000;
+      width: 100% !important;
+      height: auto !important;
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
     }
 
     canvas:focus { outline: none; }
@@ -57,15 +65,15 @@
     #loading-overlay {
       position: absolute;
       inset: 0;
-      min-height: 300px;
-      background: #000;
+      min-height: 420px;
+      background: #080808;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       gap: 0;
       transition: opacity 0.5s;
-      padding: 24px;
+      padding: 20px;
     }
 
     #loading-overlay.hidden {
@@ -73,30 +81,54 @@
       pointer-events: none;
     }
 
-    /* Menorah */
-    .menorah {
-      font-size: 0.62rem;
-      line-height: 1.35;
-      color: #7a5c1a;
-      white-space: pre;
-      text-align: center;
-      margin-bottom: 20px;
-      letter-spacing: 0.08em;
-      text-shadow: 0 0 8px #c8a84b44;
+    /* Menorah SVG */
+    .menorah-wrap {
+      margin-bottom: 18px;
     }
+
+    .menorah-arm {
+      stroke: #7a5c18;
+      stroke-width: 2.5;
+      fill: none;
+      stroke-linecap: round;
+    }
+
+    .menorah-base {
+      stroke: #6a4e14;
+      stroke-width: 2.5;
+      fill: none;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    @keyframes flicker {
+      0%,100% { opacity: 1;   transform: scaleY(1)   scaleX(1); }
+      25%      { opacity: 0.8; transform: scaleY(1.1) scaleX(0.9); }
+      50%      { opacity: 0.9; transform: scaleY(0.95) scaleX(1.05); }
+      75%      { opacity: 1;   transform: scaleY(1.08) scaleX(0.92); }
+    }
+
+    .flame { transform-origin: center bottom; }
+    .flame:nth-child(1) { animation: flicker 1.7s ease-in-out infinite 0.0s; }
+    .flame:nth-child(2) { animation: flicker 1.9s ease-in-out infinite 0.3s; }
+    .flame:nth-child(3) { animation: flicker 1.5s ease-in-out infinite 0.7s; }
+    .flame:nth-child(4) { animation: flicker 2.1s ease-in-out infinite 0.1s; }
+    .flame:nth-child(5) { animation: flicker 1.6s ease-in-out infinite 0.5s; }
+    .flame:nth-child(6) { animation: flicker 1.8s ease-in-out infinite 0.9s; }
+    .flame:nth-child(7) { animation: flicker 2.0s ease-in-out infinite 0.2s; }
 
     /* Lore quote */
     #lore-quote {
-      font-size: 0.78rem;
+      font-size: 0.82rem;
       color: #a88838;
-      max-width: 380px;
+      max-width: 400px;
       text-align: center;
-      min-height: 3.2em;
-      line-height: 1.6;
+      min-height: 3.4em;
+      line-height: 1.65;
       font-style: italic;
-      margin-bottom: 24px;
+      margin-bottom: 6px;
       opacity: 1;
-      transition: opacity 0.6s ease;
+      transition: opacity 0.55s ease;
     }
 
     #lore-quote.fade { opacity: 0; }
@@ -104,7 +136,8 @@
     #lore-source {
       font-size: 0.6rem;
       color: #4a3810;
-      margin-top: 4px;
+      letter-spacing: 0.05em;
+      margin-bottom: 22px;
       min-height: 1em;
     }
 
@@ -113,15 +146,14 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 8px;
-      margin-top: 4px;
+      gap: 7px;
     }
 
     .progress-bar-bg {
       width: 260px;
-      height: 4px;
-      background: #1a1508;
-      border: 1px solid #3a2a10;
+      height: 3px;
+      background: #141008;
+      border: 1px solid #2e2008;
       border-radius: 2px;
       overflow: hidden;
     }
@@ -129,11 +161,11 @@
     .progress-bar-fill {
       height: 100%;
       width: 0%;
-      background: linear-gradient(90deg, #6a4810, #e8c55b, #6a4810);
+      background: linear-gradient(90deg, #4a3010, #e8c55b, #4a3010);
       background-size: 200% 100%;
       border-radius: 2px;
       transition: width 0.3s ease;
-      animation: shimmer 2s linear infinite;
+      animation: shimmer 2.5s linear infinite;
     }
 
     @keyframes shimmer {
@@ -142,41 +174,43 @@
     }
 
     #status-text {
-      font-size: 0.62rem;
-      color: #4a3810;
+      font-size: 0.6rem;
+      color: #3a2808;
       min-height: 1em;
       text-align: center;
+      letter-spacing: 0.04em;
     }
 
     #error-message {
       display: none;
-      color: #c84b4b;
+      color: #c86060;
       font-size: 0.78rem;
-      max-width: 420px;
+      max-width: 440px;
       text-align: center;
-      padding: 12px 16px;
-      border: 1px solid #5a2020;
-      background: #130606;
-      margin-top: 12px;
-      line-height: 1.5;
+      padding: 14px 18px;
+      border: 1px solid #4a1818;
+      background: #0e0404;
+      margin-top: 16px;
+      line-height: 1.6;
+      border-radius: 2px;
     }
 
     footer {
       padding: 10px 0;
-      font-size: 0.62rem;
-      color: #2e2008;
+      font-size: 0.6rem;
+      color: #251808;
       text-align: center;
     }
 
-    footer a { color: #4a3810; text-decoration: none; }
-    footer a:hover { color: #c8a84b; }
+    footer a { color: #3a2608; text-decoration: none; }
+    footer a:hover { color: #c8a84b; transition: color 0.2s; }
   </style>
 </head>
 <body>
 
   <header>
     <h1>Order Of The Ziz</h1>
-    <p>a Jewish roguelike &bull; &#x05DE;&#x05E9;&#x05D7;&#x05E7; &#x05E8;&#x05D5;&#x05D2;&#x05DC;&#x05D9;&#x05E7; &#x05D9;&#x05D4;&#x05D5;&#x05D3;&#x05D9;</p>
+    <p>לצלול למעמקי האדמה, אל האופל. אל התועבה.</p>
   </header>
 
   <div id="canvas-container">
@@ -184,19 +218,56 @@
 
     <div id="loading-overlay">
 
-      <pre class="menorah">    *   *   *   *   *   *   *
-      |   |   |   |   |   |   |
-      |   |   |   |   |   |   |
-  ____|   |   |   |   |   |   |____
- /    |___|___|___|___|___|___|    \
-|              |   |              |
-               |   |
-           ____|   |____
-          /             \
-         |_______________|</pre>
+      <!-- Menorah SVG -->
+      <div class="menorah-wrap">
+        <svg viewBox="0 0 200 162" xmlns="http://www.w3.org/2000/svg" width="180" height="145" aria-hidden="true">
 
-      <div id="lore-quote">&ldquo;The stone here is young. Too young to remember mercy.&rdquo;</div>
-      <div id="lore-source">— Level 1: The Mouth of the Burrow</div>
+          <!-- Animated flames (7) -->
+          <g id="flames">
+            <ellipse class="flame" cx="10"  cy="8" rx="3.5" ry="7" fill="#e8c55b" opacity="0.85"/>
+            <ellipse class="flame" cx="40"  cy="8" rx="3.5" ry="7" fill="#e8c55b" opacity="0.85"/>
+            <ellipse class="flame" cx="70"  cy="8" rx="3.5" ry="7" fill="#e8c55b" opacity="0.85"/>
+            <ellipse class="flame" cx="100" cy="8" rx="3.5" ry="7" fill="#f0d870" opacity="0.9"/>
+            <ellipse class="flame" cx="130" cy="8" rx="3.5" ry="7" fill="#e8c55b" opacity="0.85"/>
+            <ellipse class="flame" cx="160" cy="8" rx="3.5" ry="7" fill="#e8c55b" opacity="0.85"/>
+            <ellipse class="flame" cx="190" cy="8" rx="3.5" ry="7" fill="#e8c55b" opacity="0.85"/>
+          </g>
+
+          <!-- Arms: quadratic bezier from center shaft outward and up -->
+          <!-- Each arm: M center_x,arm_y  Q candle_x,arm_y  candle_x,candle_top -->
+          <g class="menorah-arm">
+            <!-- Inner arms (connect at y=72) -->
+            <path d="M 100,72 Q  70,72  70,15"/>
+            <path d="M 100,72 Q 130,72 130,15"/>
+            <!-- Middle arms (connect at y=84) -->
+            <path d="M 100,84 Q  40,84  40,15"/>
+            <path d="M 100,84 Q 160,84 160,15"/>
+            <!-- Outer arms (connect at y=96) -->
+            <path d="M 100,96 Q  10,96  10,15"/>
+            <path d="M 100,96 Q 190,96 190,15"/>
+            <!-- Center shaft -->
+            <line x1="100" y1="15" x2="100" y2="112"/>
+          </g>
+
+          <!-- Base -->
+          <g class="menorah-base">
+            <!-- Neck -->
+            <path d="M 84,112 Q 100,118 116,112"/>
+            <!-- Platform tiers -->
+            <path d="M 60,124 L 140,124"/>
+            <path d="M 60,118 L 60,124"/>
+            <path d="M 140,118 L 140,124"/>
+            <path d="M 44,136 L 156,136"/>
+            <path d="M 44,124 L 44,136"/>
+            <path d="M 156,124 L 156,136"/>
+            <path d="M 50,148 Q 100,155 150,148"/>
+          </g>
+
+        </svg>
+      </div>
+
+      <div id="lore-quote"></div>
+      <div id="lore-source"></div>
 
       <div class="progress-wrap">
         <div class="progress-bar-bg">
@@ -215,7 +286,7 @@
   </footer>
 
   <script type="text/javascript">
-    // ── Lore quotes ──────────────────────────────────────────────
+    // ── Lore quotes ───────────────────────────────────────────────
     var loreQuotes = [
       { text: "The stone here is young. Too young to remember mercy. The earth opens without ceremony.", src: "Level 1 — The Mouth of the Burrow" },
       { text: "This entrance was not hidden. It was abandoned. No one seals a door they still believe in.", src: "Level 1 — The Mouth of the Burrow" },
@@ -250,50 +321,50 @@
     var sourceEl = document.getElementById('lore-source');
     var quoteIdx = Math.floor(Math.random() * loreQuotes.length);
 
+    function setQuote(idx) {
+      quoteEl.textContent  = '\u201c' + loreQuotes[idx].text + '\u201d';
+      sourceEl.textContent = '\u2014 ' + loreQuotes[idx].src;
+    }
+
     function showNextQuote() {
       quoteEl.classList.add('fade');
       setTimeout(function() {
         quoteIdx = (quoteIdx + 1) % loreQuotes.length;
-        quoteEl.textContent = '\u201c' + loreQuotes[quoteIdx].text + '\u201d';
-        sourceEl.textContent = '\u2014 ' + loreQuotes[quoteIdx].src;
+        setQuote(quoteIdx);
         quoteEl.classList.remove('fade');
       }, 600);
     }
 
-    // Set initial quote
-    quoteEl.textContent = '\u201c' + loreQuotes[quoteIdx].text + '\u201d';
-    sourceEl.textContent = '\u2014 ' + loreQuotes[quoteIdx].src;
-
-    var quoteTimer = setInterval(showNextQuote, 4000);
+    setQuote(quoteIdx);
+    var quoteTimer = setInterval(showNextQuote, 4500);
 
     // ── Emscripten Module ─────────────────────────────────────────
-    var statusElement  = document.getElementById('status-text');
-    var progressFill   = document.getElementById('progress-fill');
-    var loadingOverlay = document.getElementById('loading-overlay');
-    var errorMessage   = document.getElementById('error-message');
-    var totalDeps = 0;
+    var statusEl   = document.getElementById('status-text');
+    var fillEl     = document.getElementById('progress-fill');
+    var overlayEl  = document.getElementById('loading-overlay');
+    var errorEl    = document.getElementById('error-message');
+    var totalDeps  = 0;
 
     var Module = {
       canvas: (function() {
-        var canvas = document.getElementById('canvas');
-        canvas.addEventListener('webglcontextlost', function(e) {
+        var c = document.getElementById('canvas');
+        c.addEventListener('webglcontextlost', function(e) {
           alert('WebGL context lost — please reload the page.');
           e.preventDefault();
         }, false);
-        return canvas;
+        return c;
       })(),
 
       setStatus: function(text) {
-        if (!Module.setStatus.last) Module.setStatus.last = { time: Date.now(), text: '' };
+        if (!Module.setStatus.last) Module.setStatus.last = { text: '' };
         if (text === Module.setStatus.last.text) return;
         Module.setStatus.last.text = text;
-
         if (text) {
-          statusElement.textContent = text;
+          statusEl.textContent = text;
         } else {
           clearInterval(quoteTimer);
-          loadingOverlay.classList.add('hidden');
-          setTimeout(function() { loadingOverlay.style.display = 'none'; }, 500);
+          overlayEl.classList.add('hidden');
+          setTimeout(function() { overlayEl.style.display = 'none'; }, 500);
           document.getElementById('canvas').focus();
         }
       },
@@ -301,34 +372,26 @@
       monitorRunDependencies: function(left) {
         totalDeps = Math.max(totalDeps, left);
         if (totalDeps > 0) {
-          var pct = Math.round((totalDeps - left) / totalDeps * 100);
-          progressFill.style.width = pct + '%';
+          fillEl.style.width = Math.round((totalDeps - left) / totalDeps * 100) + '%';
         }
       },
 
       onAbort: function(what) {
         clearInterval(quoteTimer);
-        errorMessage.style.display = 'block';
-        errorMessage.innerHTML = '<strong>Failed to start the game.</strong><br><br>' + what + '<br><br>Try refreshing the page (Ctrl+Shift+R).';
-        loadingOverlay.classList.remove('hidden');
-        loadingOverlay.style.display = 'flex';
+        errorEl.style.display = 'block';
+        errorEl.innerHTML = '<strong>Failed to start the game.</strong><br><br>' + what + '<br><br>Try a hard refresh (Ctrl+Shift+R).';
+        overlayEl.classList.remove('hidden');
+        overlayEl.style.display = 'flex';
       },
 
-      print: function(text) {
-        if (arguments.length > 1) text = Array.prototype.slice.call(arguments).join(' ');
-        console.log(text);
-      },
-
-      printErr: function(text) {
-        if (arguments.length > 1) text = Array.prototype.slice.call(arguments).join(' ');
-        console.error(text);
-      }
+      print:    function(t) { console.log(Array.prototype.join.call(arguments,' ')); },
+      printErr: function(t) { console.error(Array.prototype.join.call(arguments,' ')); }
     };
 
     window.addEventListener('error', function(e) {
       clearInterval(quoteTimer);
-      errorMessage.style.display = 'block';
-      errorMessage.innerHTML = '<strong>Failed to start the game.</strong><br><br>' + e.message + '<br><br>Try refreshing the page (Ctrl+Shift+R).';
+      errorEl.style.display = 'block';
+      errorEl.innerHTML = '<strong>Failed to start the game.</strong><br><br>' + e.message + '<br><br>Try a hard refresh (Ctrl+Shift+R).';
     });
   </script>
 
