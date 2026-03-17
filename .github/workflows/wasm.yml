@@ -53,7 +53,6 @@ jobs:
           -sASYNCIFY_STACK_SIZE=65536 \
           -sALLOW_MEMORY_GROWTH=1 \
           -sINITIAL_MEMORY=67108864 \
-          -sFORCED_EXITS=1 \
           -sEXIT_RUNTIME=1 \
           --preload-file bin/assets@assets \
           --shell-file src/platform/shell.html \
