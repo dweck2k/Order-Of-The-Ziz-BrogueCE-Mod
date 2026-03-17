@@ -41,7 +41,7 @@ jobs:
           src/platform/sdl2-platform.c \
           src/platform/tiles.c \
           -Isrc/brogue -Isrc/platform -Isrc/variants \
-          -std=c99 -O1 \
+          -std=c99 -O2 \
           -Wall -Wno-parentheses -Wno-unused-result -Wformat \
           -DBROGUE_SDL \
           -DDATADIR=. \

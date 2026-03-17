@@ -435,6 +435,14 @@ static enum graphicsModes _setGraphicsMode(enum graphicsModes mode) {
 }
 
 
+// Direct (non-indirect) wrappers so Emscripten Asyncify can trace the call chain
+// without hitting function-pointer table signature mismatches.
+#ifdef __EMSCRIPTEN__
+void sdl_gameLoop_direct(void) { _gameLoop(); }
+void sdl_nextKeyOrMouseEvent_direct(rogueEvent *r, boolean t, boolean c) { _nextKeyOrMouseEvent(r, t, c); }
+boolean sdl_pauseForMilliseconds_direct(short ms, PauseBehavior b) { return _pauseForMilliseconds(ms, b); }
+#endif
+
 struct brogueConsole sdlConsole = {
     _gameLoop,
     _pauseForMilliseconds,

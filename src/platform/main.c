@@ -350,7 +350,13 @@ int main(int argc, char *argv[])
     graphicsMode = setGraphicsMode(initialGraphics);
 
     loadKeymap();
+#ifdef __EMSCRIPTEN__
+    // Call directly (not via function pointer) so Asyncify can trace the call chain
+    extern void sdl_gameLoop_direct(void);
+    sdl_gameLoop_direct();
+#else
     currentConsole.gameLoop();
+#endif
 
     return 0;
 }

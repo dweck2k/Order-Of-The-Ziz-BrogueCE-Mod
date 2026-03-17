@@ -236,11 +236,21 @@ boolean controlKeyIsDown() {
 }
 
 void nextKeyOrMouseEvent(rogueEvent *returnEvent, boolean textInput, boolean colorsDance) {
+#ifdef __EMSCRIPTEN__
+    extern void sdl_nextKeyOrMouseEvent_direct(rogueEvent*, boolean, boolean);
+    sdl_nextKeyOrMouseEvent_direct(returnEvent, textInput, colorsDance);
+#else
     currentConsole.nextKeyOrMouseEvent(returnEvent, textInput, colorsDance);
+#endif
 }
 
 boolean pauseForMilliseconds(short milliseconds, PauseBehavior behavior) {
+#ifdef __EMSCRIPTEN__
+    extern boolean sdl_pauseForMilliseconds_direct(short, PauseBehavior);
+    return sdl_pauseForMilliseconds_direct(milliseconds, behavior);
+#else
     return currentConsole.pauseForMilliseconds(milliseconds, behavior);
+#endif
 }
 
 void notifyEvent(short eventId, int data1, int data2, const char *str1, const char *str2) {
