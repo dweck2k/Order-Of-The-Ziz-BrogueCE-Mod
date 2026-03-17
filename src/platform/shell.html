@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="he" dir="rtl">
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -20,19 +20,19 @@
 
     header {
       text-align: center;
-      padding: 16px 0 12px;
+      padding: 14px 0 10px;
       letter-spacing: 0.05em;
     }
 
     header h1 {
       font-size: 1.5rem;
       color: #e8c55b;
-      text-shadow: 0 0 16px #b8922a88;
+      text-shadow: 0 0 20px #c8a84b66;
       margin-bottom: 4px;
     }
 
     header p {
-      font-size: 0.75rem;
+      font-size: 0.72rem;
       color: #7a6030;
     }
 
@@ -49,21 +49,23 @@
       display: block;
       border: 1px solid #2a2010;
       background: #000;
-      /* Emscripten will set width/height programmatically */
     }
 
     canvas:focus { outline: none; }
 
+    /* ── Loading overlay ── */
     #loading-overlay {
       position: absolute;
       inset: 0;
+      min-height: 300px;
       background: #000;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 16px;
-      transition: opacity 0.4s;
+      gap: 0;
+      transition: opacity 0.5s;
+      padding: 24px;
     }
 
     #loading-overlay.hidden {
@@ -71,31 +73,77 @@
       pointer-events: none;
     }
 
-    .loading-title {
-      font-size: 1.1rem;
-      color: #c8a84b;
+    /* Menorah */
+    .menorah {
+      font-size: 0.62rem;
+      line-height: 1.35;
+      color: #7a5c1a;
+      white-space: pre;
+      text-align: center;
+      margin-bottom: 20px;
+      letter-spacing: 0.08em;
+      text-shadow: 0 0 8px #c8a84b44;
+    }
+
+    /* Lore quote */
+    #lore-quote {
+      font-size: 0.78rem;
+      color: #a88838;
+      max-width: 380px;
+      text-align: center;
+      min-height: 3.2em;
+      line-height: 1.6;
+      font-style: italic;
+      margin-bottom: 24px;
+      opacity: 1;
+      transition: opacity 0.6s ease;
+    }
+
+    #lore-quote.fade { opacity: 0; }
+
+    #lore-source {
+      font-size: 0.6rem;
+      color: #4a3810;
+      margin-top: 4px;
+      min-height: 1em;
+    }
+
+    /* Progress */
+    .progress-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      margin-top: 4px;
     }
 
     .progress-bar-bg {
-      width: 280px;
-      height: 6px;
+      width: 260px;
+      height: 4px;
       background: #1a1508;
       border: 1px solid #3a2a10;
-      border-radius: 3px;
+      border-radius: 2px;
       overflow: hidden;
     }
 
     .progress-bar-fill {
       height: 100%;
       width: 0%;
-      background: linear-gradient(90deg, #8a6020, #e8c55b);
-      border-radius: 3px;
-      transition: width 0.2s ease;
+      background: linear-gradient(90deg, #6a4810, #e8c55b, #6a4810);
+      background-size: 200% 100%;
+      border-radius: 2px;
+      transition: width 0.3s ease;
+      animation: shimmer 2s linear infinite;
+    }
+
+    @keyframes shimmer {
+      0%   { background-position: 200% center; }
+      100% { background-position: -200% center; }
     }
 
     #status-text {
-      font-size: 0.7rem;
-      color: #5a4820;
+      font-size: 0.62rem;
+      color: #4a3810;
       min-height: 1em;
       text-align: center;
     }
@@ -103,22 +151,24 @@
     #error-message {
       display: none;
       color: #c84b4b;
-      font-size: 0.8rem;
-      max-width: 400px;
+      font-size: 0.78rem;
+      max-width: 420px;
       text-align: center;
-      padding: 12px;
+      padding: 12px 16px;
       border: 1px solid #5a2020;
-      background: #1a0808;
+      background: #130606;
+      margin-top: 12px;
+      line-height: 1.5;
     }
 
     footer {
-      padding: 12px 0;
-      font-size: 0.65rem;
-      color: #3a2a10;
+      padding: 10px 0;
+      font-size: 0.62rem;
+      color: #2e2008;
       text-align: center;
     }
 
-    footer a { color: #5a4820; text-decoration: none; }
+    footer a { color: #4a3810; text-decoration: none; }
     footer a:hover { color: #c8a84b; }
   </style>
 </head>
@@ -131,27 +181,96 @@
 
   <div id="canvas-container">
     <canvas id="canvas" tabindex="0" oncontextmenu="event.preventDefault()"></canvas>
+
     <div id="loading-overlay">
-      <div class="loading-title">&#x05D8;&#x05D5;&#x05E2;&#x05DF;&#x2026; Loading&hellip;</div>
-      <div class="progress-bar-bg">
-        <div class="progress-bar-fill" id="progress-fill"></div>
+
+      <pre class="menorah">    *   *   *   *   *   *   *
+      |   |   |   |   |   |   |
+      |   |   |   |   |   |   |
+  ____|   |   |   |   |   |   |____
+ /    |___|___|___|___|___|___|    \
+|              |   |              |
+               |   |
+           ____|   |____
+          /             \
+         |_______________|</pre>
+
+      <div id="lore-quote">&ldquo;The stone here is young. Too young to remember mercy.&rdquo;</div>
+      <div id="lore-source">— Level 1: The Mouth of the Burrow</div>
+
+      <div class="progress-wrap">
+        <div class="progress-bar-bg">
+          <div class="progress-bar-fill" id="progress-fill"></div>
+        </div>
+        <div id="status-text">Descending into the burrow&hellip;</div>
       </div>
-      <div id="status-text"></div>
+
       <div id="error-message"></div>
     </div>
   </div>
 
   <footer>
     based on <a href="https://github.com/tmewett/BrogueCE" target="_blank">BrogueCE</a>
-    &bull; <a href="https://github.com/dweck2k/BrogueCE-Jewish" target="_blank">source</a>
+    &bull; <a href="https://github.com/dweck2k/Order-Of-The-Ziz-BrogueCE-Mod" target="_blank">source</a>
   </footer>
 
   <script type="text/javascript">
-    var statusElement   = document.getElementById('status-text');
-    var progressFill    = document.getElementById('progress-fill');
-    var loadingOverlay  = document.getElementById('loading-overlay');
-    var errorMessage    = document.getElementById('error-message');
+    // ── Lore quotes ──────────────────────────────────────────────
+    var loreQuotes = [
+      { text: "The stone here is young. Too young to remember mercy. The earth opens without ceremony.", src: "Level 1 — The Mouth of the Burrow" },
+      { text: "This entrance was not hidden. It was abandoned. No one seals a door they still believe in.", src: "Level 1 — The Mouth of the Burrow" },
+      { text: "Dust settles as you step inside. The world above closes quietly behind you.", src: "Level 1 — The Mouth of the Burrow" },
+      { text: "You feel watched, but nothing looks back. Not yet.", src: "Level 1 — The Mouth of the Burrow" },
+      { text: "Scratches cover the walls. Not claws. Fingernails.", src: "Level 5 — First Signs" },
+      { text: "Names are carved, erased, then carved again. Someone cared enough to correct them.", src: "Level 5 — First Signs" },
+      { text: "The Cult said others came before. Now you believe them.", src: "Level 5 — First Signs" },
+      { text: "This chamber was once a place of study. Fear came later.", src: "Level 10 — The Remembering" },
+      { text: "Half-finished rituals litter the ground. No one stayed to finish them.", src: "Level 10 — The Remembering" },
+      { text: "The Abomination learned patience in this place.", src: "Level 10 — The Remembering" },
+      { text: "You stand between decay and record. Both lead downward.", src: "Level 13 — The Split Path" },
+      { text: "Choice is made without certainty. It always is.", src: "Level 13 — The Split Path" },
+      { text: "These beings were human once. Now they serve without knowing whom.", src: "Level 16 — The Servants" },
+      { text: "Corruption did not break them. It redirected them.", src: "Level 16 — The Servants" },
+      { text: "The Cult warned you: belief can be weaponized.", src: "Level 16 — The Servants" },
+      { text: "The walls remember what the tongue must not say.", src: "Level 19 — The Weight of Names" },
+      { text: "Knowledge accumulates here like pressure.", src: "Level 19 — The Weight of Names" },
+      { text: "The Book was hidden for reasons beyond fear.", src: "Level 19 — The Weight of Names" },
+      { text: "Nothing moves. Nothing breathes.", src: "Level 22 — The Chamber of Silence" },
+      { text: "The absence is deliberate.", src: "Level 22 — The Chamber of Silence" },
+      { text: "The burrow tightens, aware of your presence.", src: "Level 24 — The Heart of the Burrow" },
+      { text: "Law and heresy bind the seal together.", src: "Level 24 — The Heart of the Burrow" },
+      { text: "The Book is heavier than flesh should allow.", src: "Level 26 — The Book of the Abomination" },
+      { text: "The Abomination does not scream. It remembers.", src: "Level 26 — The Book of the Abomination" },
+      { text: "You carry consequence, not triumph.", src: "Level 26 — The Book of the Abomination" },
+      { text: "You did not save the world. You corrected its course.", src: "Ending — Return with the Book" },
+      { text: "The world remains unaware. This is success.", src: "Ending — Return with the Book" },
+    ];
 
+    var quoteEl  = document.getElementById('lore-quote');
+    var sourceEl = document.getElementById('lore-source');
+    var quoteIdx = Math.floor(Math.random() * loreQuotes.length);
+
+    function showNextQuote() {
+      quoteEl.classList.add('fade');
+      setTimeout(function() {
+        quoteIdx = (quoteIdx + 1) % loreQuotes.length;
+        quoteEl.textContent = '\u201c' + loreQuotes[quoteIdx].text + '\u201d';
+        sourceEl.textContent = '\u2014 ' + loreQuotes[quoteIdx].src;
+        quoteEl.classList.remove('fade');
+      }, 600);
+    }
+
+    // Set initial quote
+    quoteEl.textContent = '\u201c' + loreQuotes[quoteIdx].text + '\u201d';
+    sourceEl.textContent = '\u2014 ' + loreQuotes[quoteIdx].src;
+
+    var quoteTimer = setInterval(showNextQuote, 4000);
+
+    // ── Emscripten Module ─────────────────────────────────────────
+    var statusElement  = document.getElementById('status-text');
+    var progressFill   = document.getElementById('progress-fill');
+    var loadingOverlay = document.getElementById('loading-overlay');
+    var errorMessage   = document.getElementById('error-message');
     var totalDeps = 0;
 
     var Module = {
@@ -172,9 +291,9 @@
         if (text) {
           statusElement.textContent = text;
         } else {
-          // Loading complete — hide overlay
+          clearInterval(quoteTimer);
           loadingOverlay.classList.add('hidden');
-          setTimeout(function() { loadingOverlay.style.display = 'none'; }, 400);
+          setTimeout(function() { loadingOverlay.style.display = 'none'; }, 500);
           document.getElementById('canvas').focus();
         }
       },
@@ -188,8 +307,9 @@
       },
 
       onAbort: function(what) {
+        clearInterval(quoteTimer);
         errorMessage.style.display = 'block';
-        errorMessage.textContent = 'Error: ' + what;
+        errorMessage.innerHTML = '<strong>Failed to start the game.</strong><br><br>' + what + '<br><br>Try refreshing the page (Ctrl+Shift+R).';
         loadingOverlay.classList.remove('hidden');
         loadingOverlay.style.display = 'flex';
       },
@@ -205,10 +325,11 @@
       }
     };
 
-    window.onerror = function(message) {
+    window.addEventListener('error', function(e) {
+      clearInterval(quoteTimer);
       errorMessage.style.display = 'block';
-      errorMessage.textContent = 'JavaScript error: ' + message;
-    };
+      errorMessage.innerHTML = '<strong>Failed to start the game.</strong><br><br>' + e.message + '<br><br>Try refreshing the page (Ctrl+Shift+R).';
+    });
   </script>
 
   {{{ SCRIPT }}}
