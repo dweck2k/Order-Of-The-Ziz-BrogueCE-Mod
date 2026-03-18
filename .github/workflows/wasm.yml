@@ -57,7 +57,8 @@ jobs:
           -pthread \
           -sPROXY_TO_PTHREAD \
           -sPTHREAD_POOL_SIZE=1 \
-          -sOFFSCREEN_FRAMEBUFFER=1 \
+          -sOFFSCREENCANVAS_SUPPORT=1 \
+          "-sOFFSCREENCANVASES='#canvas'" \
           -sALLOW_MEMORY_GROWTH=1 \
           -sINITIAL_MEMORY=67108864 \
           -sEXIT_RUNTIME=1 \
