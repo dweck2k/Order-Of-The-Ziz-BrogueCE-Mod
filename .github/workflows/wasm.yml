@@ -36,7 +36,10 @@ jobs:
         # Pre-build dependencies so SDL2_image port won't trigger them
         embuilder build sdl2 zlib libpng
         mkdir -p web
-        emcc \
+        echo "=== emcc version ==="
+        emcc --version
+        echo "=== Building with STACK_SIZE=4194304 ==="
+        emcc -v \
           src/brogue/*.c \
           src/variants/*.c \
           src/platform/main.c \
@@ -60,19 +63,36 @@ jobs:
           -sASSERTIONS=1 \
           -sALLOW_MEMORY_GROWTH=1 \
           -sINITIAL_MEMORY=67108864 \
-          -sTOTAL_STACK=4194304 \
+          -sSTACK_SIZE=4194304 \
           --preload-file bin/assets@assets \
           --shell-file src/platform/shell.html \
           -o web/brogue.html
 
     - name: "Verify stack size in build output"
       run: |
-        echo "=== WASM globals ==="
-        wasm-objdump -x web/brogue.wasm 2>/dev/null | grep -i stack || echo "wasm-objdump not found, trying wasm-dis"
-        echo "=== Searching JS for stack init ==="
-        grep -oP '__stack_\w+\s*=\s*\d+' web/brogue.js | head -5 || true
-        grep -oP 'STACK_SIZE.*?[,;]' web/brogue.js | head -3 || true
-        grep -oP 'TOTAL_STACK.*?[,;]' web/brogue.js | head -3 || true
+        echo "=== Install wabt for wasm-objdump ==="
+        sudo apt-get install -y wabt 2>/dev/null || true
+        echo "=== WASM globals (stack-related) ==="
+        wasm-objdump -x web/brogue.wasm 2>/dev/null | grep -i stack || echo "wasm-objdump not available"
+        echo "=== WASM global section ==="
+        wasm-objdump -x web/brogue.wasm 2>/dev/null | head -60 || true
+        echo "=== Node.js: read WASM stack globals ==="
+        node -e "
+          const fs = require('fs');
+          const buf = fs.readFileSync('web/brogue.wasm');
+          const mod = new WebAssembly.Module(buf);
+          const exports = WebAssembly.Module.exports(mod);
+          console.log('Exports with stack in name:');
+          exports.filter(e => /stack/i.test(e.name)).forEach(e => console.log(' ', e));
+          // Instantiate with minimal imports to read globals
+          const imports = WebAssembly.Module.imports(mod);
+          console.log('Imports with stack in name:');
+          imports.filter(i => /stack/i.test(i.name)).forEach(i => console.log(' ', i));
+        " || echo "Node check failed"
+        echo "=== JS: grep for stack_base/stack_end assignments ==="
+        grep -oP '(stack_base|stack_end|__stack_pointer|STACK_SIZE)\s*[=:]\s*\d+' web/brogue.js | head -10 || true
+        echo "=== JS: grep for emscripten_stack ==="
+        grep -n 'emscripten_stack' web/brogue.js | head -10 || true
         echo "=== JS file size ==="
         wc -c web/brogue.js web/brogue.wasm
 
