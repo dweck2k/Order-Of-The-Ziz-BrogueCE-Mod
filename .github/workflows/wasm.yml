@@ -55,8 +55,8 @@ jobs:
           -sUSE_SDL_IMAGE=2 \
           "-sSDL2_IMAGE_FORMATS=[\"png\"]" \
           -sASYNCIFY \
-          -sASYNCIFY_IGNORE_INDIRECT \
-          "-sASYNCIFY_ADD=['main','__main_argc_argv','__original_main']" \
+          -sASYNCIFY_STACK_SIZE=65536 \
+          "-sASYNCIFY_REMOVE=['Emscripten_HandleMouseMove','Emscripten_HandleMouseButton','Emscripten_HandleMouseFocus','Emscripten_HandleWheel','Emscripten_HandleKey','Emscripten_HandleKeyPress','Emscripten_HandleFullscreenChange','Emscripten_HandleResize','Emscripten_HandleCanvasResize','Emscripten_HandleVisibilityChange','Emscripten_HandleFocus','Emscripten_HandlePointerLockChange','Emscripten_HandleTouch']" \
           -sASSERTIONS=1 \
           -sALLOW_MEMORY_GROWTH=1 \
           -sINITIAL_MEMORY=67108864 \
