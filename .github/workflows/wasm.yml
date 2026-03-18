@@ -31,8 +31,10 @@ jobs:
 
     - name: "Build WASM"
       env:
-        EMCC_CORES: "1"
+        EM_EXCLUSIVE_CACHE_ACCESS: "1"
       run: |
+        # Pre-build dependencies so SDL2_image port won't trigger them
+        embuilder build sdl2 sdl2-mt zlib libpng libpng-mt
         mkdir -p web
         emcc \
           src/brogue/*.c \
