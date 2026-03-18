@@ -36,28 +36,31 @@ jobs:
         # Pre-build dependencies so SDL2_image port won't trigger them
         embuilder build sdl2 zlib libpng
         mkdir -p web
-        # Compile source files to object files first
-        emcc -c src/brogue/*.c src/variants/*.c \
-          src/platform/main.c src/platform/platformdependent.c \
-          src/platform/null-platform.c src/platform/sdl2-platform.c \
+        emcc \
+          src/brogue/*.c \
+          src/variants/*.c \
+          src/platform/main.c \
+          src/platform/platformdependent.c \
+          src/platform/null-platform.c \
+          src/platform/sdl2-platform.c \
           src/platform/tiles.c \
           -Isrc/brogue -Isrc/platform -Isrc/variants \
           -std=c99 -O2 \
           -Wall -Wno-parentheses -Wno-unused-result -Wformat \
-          -DBROGUE_SDL -DDATADIR=. -DRELEASE -DBROGUE_EXTRA_VERSION=
-
-        # Link with all Emscripten settings
-        emcc *.o \
+          -DBROGUE_SDL \
+          -DDATADIR=. \
+          -DRELEASE \
+          -DBROGUE_EXTRA_VERSION= \
           -sUSE_SDL=2 \
           -sUSE_SDL_IMAGE=2 \
           "-sSDL2_IMAGE_FORMATS=[\"png\"]" \
           -sASYNCIFY \
           -sASYNCIFY_STACK_SIZE=131072 \
-          -sSTACK_SIZE=4194304 \
           "-sASYNCIFY_REMOVE=['Emscripten_HandleMouseMove','Emscripten_HandleMouseButton','Emscripten_HandleMouseFocus','Emscripten_HandleWheel','Emscripten_HandleKey','Emscripten_HandleKeyPress','Emscripten_HandleFullscreenChange','Emscripten_HandleResize','Emscripten_HandleCanvasResize','Emscripten_HandleVisibilityChange','Emscripten_HandleFocus','Emscripten_HandlePointerLockChange','Emscripten_HandleTouch']" \
           -sASSERTIONS=1 \
           -sALLOW_MEMORY_GROWTH=1 \
           -sINITIAL_MEMORY=67108864 \
+          -Wl,-z,stack-size=4194304 \
           --preload-file bin/assets@assets \
           --shell-file src/platform/shell.html \
           -o web/brogue.html
