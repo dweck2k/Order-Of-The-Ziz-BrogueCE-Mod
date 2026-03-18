@@ -7,6 +7,10 @@
 #include "platform.h"
 #include "tiles.h"
 
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#endif
+
 #define PAUSE_BETWEEN_EVENT_POLLING     36L//17
 #define MAX_REMAPS  128
 
@@ -291,7 +295,11 @@ static void _delayUpTo(short ms) {
     ms -= timeDiff;
 
     if (ms > 0) {
+#ifdef __EMSCRIPTEN__
+        emscripten_sleep(ms);
+#else
         SDL_Delay(ms);
+#endif
     } // else delaying further would go past the time we want to delay until
 
     lastDelayTime = SDL_GetTicks();

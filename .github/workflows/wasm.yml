@@ -34,7 +34,7 @@ jobs:
         EM_EXCLUSIVE_CACHE_ACCESS: "1"
       run: |
         # Pre-build dependencies so SDL2_image port won't trigger them
-        embuilder build sdl2 sdl2-mt zlib libpng libpng-mt
+        embuilder build sdl2 zlib libpng
         mkdir -p web
         emcc \
           src/brogue/*.c \
@@ -54,10 +54,9 @@ jobs:
           -sUSE_SDL=2 \
           -sUSE_SDL_IMAGE=2 \
           "-sSDL2_IMAGE_FORMATS=[\"png\"]" \
-          -pthread \
-          -sPROXY_TO_PTHREAD \
-          -sPTHREAD_POOL_SIZE=2 \
-          -sOFFSCREEN_FRAMEBUFFER=1 \
+          -sASYNCIFY \
+          -sASYNCIFY_IGNORE_INDIRECT \
+          "-sASYNCIFY_ADD=['main','__main_argc_argv','__original_main']" \
           -sASSERTIONS=1 \
           -sALLOW_MEMORY_GROWTH=1 \
           -sINITIAL_MEMORY=67108864 \
