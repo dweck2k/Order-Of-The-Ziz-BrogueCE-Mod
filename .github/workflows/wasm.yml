@@ -36,21 +36,18 @@ jobs:
         # Pre-build dependencies so SDL2_image port won't trigger them
         embuilder build sdl2 zlib libpng
         mkdir -p web
-        emcc \
-          src/brogue/*.c \
-          src/variants/*.c \
-          src/platform/main.c \
-          src/platform/platformdependent.c \
-          src/platform/null-platform.c \
-          src/platform/sdl2-platform.c \
+        # Compile source files to object files first
+        emcc -c src/brogue/*.c src/variants/*.c \
+          src/platform/main.c src/platform/platformdependent.c \
+          src/platform/null-platform.c src/platform/sdl2-platform.c \
           src/platform/tiles.c \
           -Isrc/brogue -Isrc/platform -Isrc/variants \
           -std=c99 -O2 \
           -Wall -Wno-parentheses -Wno-unused-result -Wformat \
-          -DBROGUE_SDL \
-          -DDATADIR=. \
-          -DRELEASE \
-          -DBROGUE_EXTRA_VERSION= \
+          -DBROGUE_SDL -DDATADIR=. -DRELEASE -DBROGUE_EXTRA_VERSION=
+
+        # Link with all Emscripten settings
+        emcc *.o \
           -sUSE_SDL=2 \
           -sUSE_SDL_IMAGE=2 \
           "-sSDL2_IMAGE_FORMATS=[\"png\"]" \
