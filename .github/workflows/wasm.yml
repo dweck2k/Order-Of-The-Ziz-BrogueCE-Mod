@@ -29,10 +29,11 @@ jobs:
         version: "3.1.68"
         actions-cache-folder: "emsdk-cache"
 
-    - name: "Pre-build Emscripten ports"
+    - name: "Pre-build Emscripten ports (with pthreads)"
       run: |
-        embuilder build sdl2 sdl2_image libpng zlib --pic --force
-        embuilder build sdl2 sdl2_image libpng zlib --force
+        echo "int main(){return 0;}" | emcc -x c - \
+          -sUSE_SDL=2 -sUSE_SDL_IMAGE=2 "-sSDL2_IMAGE_FORMATS=[\"png\"]" \
+          -pthread -o /dev/null
 
     - name: "Build WASM"
       run: |
