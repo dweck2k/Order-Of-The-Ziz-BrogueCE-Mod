@@ -31,9 +31,11 @@ jobs:
 
     - name: "Pre-build Emscripten ports (with pthreads)"
       run: |
-        echo "int main(){return 0;}" | EMCC_CORES=1 emcc -x c - \
-          -sUSE_SDL=2 -sUSE_SDL_IMAGE=2 "-sSDL2_IMAGE_FORMATS=[\"png\"]" \
-          -pthread -o /dev/null
+        # Build thread-safe base libraries first so SDL2_image
+        # won't trigger parallel dependency builds (cache lock)
+        embuilder build zlib
+        embuilder build libpng-mt
+        embuilder build sdl2 sdl2-mt
 
     - name: "Build WASM"
       run: |
