@@ -52,6 +52,7 @@ jobs:
           "-sSDL2_IMAGE_FORMATS=[\"png\"]" \
           -sASYNCIFY \
           -sASYNCIFY_STACK_SIZE=1048576 \
+          -sASYNCIFY_IGNORE_INDIRECT \
           -sALLOW_MEMORY_GROWTH=1 \
           -sINITIAL_MEMORY=67108864 \
           -sEXIT_RUNTIME=1 \
