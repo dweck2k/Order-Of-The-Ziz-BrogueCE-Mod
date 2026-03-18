@@ -56,12 +56,11 @@ jobs:
           "-sSDL2_IMAGE_FORMATS=[\"png\"]" \
           -pthread \
           -sPROXY_TO_PTHREAD \
-          -sPTHREAD_POOL_SIZE=1 \
+          -sPTHREAD_POOL_SIZE=2 \
           -sOFFSCREEN_FRAMEBUFFER=1 \
           -sASSERTIONS=1 \
           -sALLOW_MEMORY_GROWTH=1 \
           -sINITIAL_MEMORY=67108864 \
-          -sEXIT_RUNTIME=1 \
           --preload-file bin/assets@assets \
           --shell-file src/platform/shell.html \
           -o web/brogue.html
