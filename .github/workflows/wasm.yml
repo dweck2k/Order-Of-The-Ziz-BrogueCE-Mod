@@ -56,7 +56,7 @@ jobs:
           "-sSDL2_IMAGE_FORMATS=[\"png\"]" \
           -sASYNCIFY \
           -sASYNCIFY_STACK_SIZE=131072 \
-          -sSTACK_SIZE=8388608 \
+          -sSTACK_SIZE=4194304 \
           "-sASYNCIFY_REMOVE=['Emscripten_HandleMouseMove','Emscripten_HandleMouseButton','Emscripten_HandleMouseFocus','Emscripten_HandleWheel','Emscripten_HandleKey','Emscripten_HandleKeyPress','Emscripten_HandleFullscreenChange','Emscripten_HandleResize','Emscripten_HandleCanvasResize','Emscripten_HandleVisibilityChange','Emscripten_HandleFocus','Emscripten_HandlePointerLockChange','Emscripten_HandleTouch']" \
           -sASSERTIONS=1 \
           -sALLOW_MEMORY_GROWTH=1 \
@@ -64,6 +64,27 @@ jobs:
           --preload-file bin/assets@assets \
           --shell-file src/platform/shell.html \
           -o web/brogue.html
+
+    - name: "Verify stack size in build output"
+      run: |
+        node -e "
+        const fs = require('fs');
+        const js = fs.readFileSync('web/brogue.js', 'utf8');
+        // Search for stack-related values
+        const m = js.match(/emscripten_stack_init\((\d+),\s*(\d+)\)/);
+        if (m) {
+          const base = parseInt(m[1]);
+          const end = parseInt(m[2]);
+          console.log('Stack base:', base, '(0x' + base.toString(16) + ')');
+          console.log('Stack end:', end, '(0x' + end.toString(16) + ')');
+          console.log('Stack size:', base - end, 'bytes');
+        } else {
+          console.log('Could not find emscripten_stack_init pattern');
+          // Try to find any stack-related constants
+          const m2 = js.match(/65536|4194304|8388608/g);
+          console.log('Found values:', m2 ? m2.slice(0, 10) : 'none');
+        }
+        "
 
     - name: "Add SharedArrayBuffer support (coi-serviceworker)"
       run: cp src/platform/coi-serviceworker.min.js web/
