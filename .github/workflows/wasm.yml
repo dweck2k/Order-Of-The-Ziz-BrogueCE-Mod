@@ -29,15 +29,9 @@ jobs:
         version: "3.1.68"
         actions-cache-folder: "emsdk-cache"
 
-    - name: "Pre-build Emscripten ports (with pthreads)"
-      run: |
-        # Build thread-safe base libraries first so SDL2_image
-        # won't trigger parallel dependency builds (cache lock)
-        embuilder build zlib
-        embuilder build libpng-mt
-        embuilder build sdl2 sdl2-mt
-
     - name: "Build WASM"
+      env:
+        EMCC_CORES: "1"
       run: |
         mkdir -p web
         emcc \
