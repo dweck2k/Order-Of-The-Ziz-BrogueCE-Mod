@@ -65,9 +65,7 @@ jobs:
           -o web/brogue.html
 
     - name: "Add SharedArrayBuffer support (coi-serviceworker)"
-      run: |
-        curl -sL https://raw.githubusercontent.com/nickvdp/coi-serviceworker/master/coi-serviceworker.min.js \
-          -o web/coi-serviceworker.min.js
+      run: cp src/platform/coi-serviceworker.min.js web/
 
     - name: "Setup Pages"
       uses: actions/configure-pages@v5
