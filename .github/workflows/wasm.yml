@@ -60,31 +60,21 @@ jobs:
           -sASSERTIONS=1 \
           -sALLOW_MEMORY_GROWTH=1 \
           -sINITIAL_MEMORY=67108864 \
-          -Wl,-z,stack-size=4194304 \
+          -sTOTAL_STACK=4194304 \
           --preload-file bin/assets@assets \
           --shell-file src/platform/shell.html \
           -o web/brogue.html
 
     - name: "Verify stack size in build output"
       run: |
-        node -e "
-        const fs = require('fs');
-        const js = fs.readFileSync('web/brogue.js', 'utf8');
-        // Search for stack-related values
-        const m = js.match(/emscripten_stack_init\((\d+),\s*(\d+)\)/);
-        if (m) {
-          const base = parseInt(m[1]);
-          const end = parseInt(m[2]);
-          console.log('Stack base:', base, '(0x' + base.toString(16) + ')');
-          console.log('Stack end:', end, '(0x' + end.toString(16) + ')');
-          console.log('Stack size:', base - end, 'bytes');
-        } else {
-          console.log('Could not find emscripten_stack_init pattern');
-          // Try to find any stack-related constants
-          const m2 = js.match(/65536|4194304|8388608/g);
-          console.log('Found values:', m2 ? m2.slice(0, 10) : 'none');
-        }
-        "
+        echo "=== WASM globals ==="
+        wasm-objdump -x web/brogue.wasm 2>/dev/null | grep -i stack || echo "wasm-objdump not found, trying wasm-dis"
+        echo "=== Searching JS for stack init ==="
+        grep -oP '__stack_\w+\s*=\s*\d+' web/brogue.js | head -5 || true
+        grep -oP 'STACK_SIZE.*?[,;]' web/brogue.js | head -3 || true
+        grep -oP 'TOTAL_STACK.*?[,;]' web/brogue.js | head -3 || true
+        echo "=== JS file size ==="
+        wc -c web/brogue.js web/brogue.wasm
 
     - name: "Add SharedArrayBuffer support (coi-serviceworker)"
       run: cp src/platform/coi-serviceworker.min.js web/
