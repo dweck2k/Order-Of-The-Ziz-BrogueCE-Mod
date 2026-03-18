@@ -4,6 +4,13 @@
 #include "platform.h"
 #include "tiles.h"
 
+#ifdef __EMSCRIPTEN__
+#include <stdio.h>
+#define WASM_DBG(fmt, ...) printf("[WASM tiles] " fmt "\n", ##__VA_ARGS__)
+#else
+#define WASM_DBG(fmt, ...)
+#endif
+
 #define PI  3.14159265358979323846
 
 #define PNG_WIDTH    2048   // width (px) of the source PNG
@@ -621,11 +628,21 @@ void updateTile(int row, int column, short charIndex,
 static SDL_Renderer *cachedRenderer = NULL;
 
 void updateScreen() {
-    if (!Win) return;
+    if (!Win) {
+        WASM_DBG("updateScreen: Win is NULL, returning early");
+        return;
+    }
+
+    WASM_DBG("updateScreen: Win=%p, cachedRenderer=%p, SDL_WasInit(VIDEO)=%d",
+             (void*)Win, (void*)cachedRenderer, SDL_WasInit(SDL_INIT_VIDEO));
 
     SDL_Renderer *renderer = cachedRenderer ? cachedRenderer : SDL_GetRenderer(Win);
+    WASM_DBG("updateScreen: after GetRenderer, renderer=%p", (void*)renderer);
+
     if (!renderer) {
+        WASM_DBG("updateScreen: creating renderer (SDL_WasInit=%d)...", SDL_WasInit(SDL_INIT_VIDEO));
         renderer = SDL_CreateRenderer(Win, -1, (softwareRendering ? SDL_RENDERER_SOFTWARE : 0));
+        WASM_DBG("updateScreen: SDL_CreateRenderer returned %p (err=%s)", (void*)renderer, SDL_GetError());
         if (!renderer) sdlfatal(__FILE__, __LINE__);
         cachedRenderer = renderer;
 
@@ -755,9 +772,11 @@ void resizeWindow(int width, int height) {
 
     if (Win == NULL) {
         // create the window
+        WASM_DBG("resizeWindow: creating window %dx%d (SDL_WasInit=%d)", width, height, SDL_WasInit(SDL_INIT_VIDEO));
         Win = SDL_CreateWindow("Brogue",
             SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height,
             SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI | (fullScreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0));
+        WASM_DBG("resizeWindow: SDL_CreateWindow returned %p (err=%s)", (void*)Win, SDL_GetError());
         if (!Win) sdlfatal(__FILE__, __LINE__);
 
         // set its icon
