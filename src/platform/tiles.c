@@ -618,13 +618,16 @@ void updateTile(int row, int column, short charIndex,
 /// This works because, unlike the accelerated renderers, the software renderer draws on a
 /// single surface and doesn't do double-buffering.
 ///
+static SDL_Renderer *cachedRenderer = NULL;
+
 void updateScreen() {
     if (!Win) return;
 
-    SDL_Renderer *renderer = SDL_GetRenderer(Win);
+    SDL_Renderer *renderer = cachedRenderer ? cachedRenderer : SDL_GetRenderer(Win);
     if (!renderer) {
         renderer = SDL_CreateRenderer(Win, -1, (softwareRendering ? SDL_RENDERER_SOFTWARE : 0));
         if (!renderer) sdlfatal(__FILE__, __LINE__);
+        cachedRenderer = renderer;
 
         if (SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_NONE) < 0) sdlfatal(__FILE__, __LINE__);
 
