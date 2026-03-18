@@ -50,15 +50,20 @@ jobs:
           -sUSE_SDL=2 \
           -sUSE_SDL_IMAGE=2 \
           "-sSDL2_IMAGE_FORMATS=[\"png\"]" \
-          -sASYNCIFY \
-          -sASYNCIFY_STACK_SIZE=1048576 \
-          -sASYNCIFY_IGNORE_INDIRECT \
+          -pthread \
+          -sPROXY_TO_PTHREAD \
+          -sPTHREAD_POOL_SIZE=1 \
           -sALLOW_MEMORY_GROWTH=1 \
           -sINITIAL_MEMORY=67108864 \
           -sEXIT_RUNTIME=1 \
           --preload-file bin/assets@assets \
           --shell-file src/platform/shell.html \
           -o web/brogue.html
+
+    - name: "Add SharedArrayBuffer support (coi-serviceworker)"
+      run: |
+        curl -sL https://raw.githubusercontent.com/nickvdp/coi-serviceworker/master/coi-serviceworker.min.js \
+          -o web/coi-serviceworker.min.js
 
     - name: "Setup Pages"
       uses: actions/configure-pages@v5
