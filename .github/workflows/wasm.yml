@@ -29,6 +29,11 @@ jobs:
         version: "3.1.68"
         actions-cache-folder: "emsdk-cache"
 
+    - name: "Pre-build Emscripten ports"
+      run: |
+        embuilder build sdl2 sdl2_image libpng zlib --pic --force
+        embuilder build sdl2 sdl2_image libpng zlib --force
+
     - name: "Build WASM"
       run: |
         mkdir -p web
