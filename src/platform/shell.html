@@ -210,6 +210,8 @@
   <!-- Enable SharedArrayBuffer on GitHub Pages (needed for pthreads/PROXY_TO_PTHREAD) -->
   <script>
     if(!window.crossOriginIsolated){
+      // Register service worker that adds COOP/COEP headers, then reload.
+      // Stop page loading to prevent Emscripten from starting without SharedArrayBuffer.
       navigator.serviceWorker.register('coi-serviceworker.min.js').then(function(reg){
         if(reg.active&&!navigator.serviceWorker.controller){
           window.location.reload();
@@ -220,6 +222,9 @@
           });
         }
       });
+      // Halt document parsing so Emscripten doesn't start before reload
+      window.stop();
+      document.body.innerHTML='<div style="color:#c8a84b;font-family:monospace;text-align:center;margin-top:40vh"><h2>Preparing cross-origin isolation...</h2><p>The page will reload automatically.</p></div>';
     }
   </script>
 
