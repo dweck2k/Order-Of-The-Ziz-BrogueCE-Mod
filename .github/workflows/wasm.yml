@@ -26,7 +26,7 @@ jobs:
     - name: "Setup Emscripten"
       uses: mymindstorm/setup-emsdk@v14
       with:
-        version: "3.1.68"
+        version: "3.1.73"
         actions-cache-folder: "emsdk-cache"
 
     - name: "Build WASM"
