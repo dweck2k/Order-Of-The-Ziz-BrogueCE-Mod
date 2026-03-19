@@ -368,12 +368,21 @@
     var totalDeps  = 0;
 
     // ── Adaptive canvas sizing ──────────────────────────────────
+    // Only scale AFTER SDL has set the real backing-store dimensions.
+    // The default canvas is 300×150; fitting to that would give SDL a
+    // wrong viewport and produce stretched colored blocks.
+    var sdlReady = false;
     function fitCanvas() {
       var canvas = document.getElementById('canvas');
       var container = document.getElementById('canvas-container');
-      if (!canvas.width || !canvas.height || !container.clientWidth) return;
+      // Skip if SDL hasn't set the backing store yet (still at default 300×150)
+      if (!sdlReady) {
+        if (canvas.width <= 300 && canvas.height <= 150) return;
+        sdlReady = true;  // SDL has set real dimensions
+      }
       var cw = container.clientWidth;
       var ch = container.clientHeight;
+      if (!cw || !ch) return;
       var aspectRatio = canvas.width / canvas.height;
       var w, h;
       if (cw / ch > aspectRatio) {
@@ -430,6 +439,8 @@
           overlayEl.classList.add('hidden');
           setTimeout(function() { overlayEl.style.display = 'none'; }, 500);
           document.getElementById('canvas').focus();
+          // Trigger adaptive fit now that the game is running
+          setTimeout(fitCanvas, 100);
         }
       },
 
@@ -462,13 +473,6 @@
     }
     setInterval(syncSaves, 5000);
     window.addEventListener('beforeunload', syncSaves);
-
-    // Call fitCanvas once the game starts rendering
-    var origSetStatus = Module.setStatus;
-    Module.setStatus = function(text) {
-      origSetStatus.call(Module, text);
-      if (!text) setTimeout(fitCanvas, 100);
-    };
 
     window.addEventListener('error', function(e) {
       clearInterval(quoteTimer);
