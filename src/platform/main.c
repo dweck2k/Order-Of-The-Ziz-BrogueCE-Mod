@@ -9,7 +9,12 @@
 
 struct brogueConsole currentConsole;
 
+#ifdef __EMSCRIPTEN__
+// Use absolute path so assets resolve correctly even if CWD changes (e.g. to /saves for IDBFS)
+char dataDirectory[BROGUE_FILENAME_MAX] = "/";
+#else
 char dataDirectory[BROGUE_FILENAME_MAX] = STRINGIFY(DATADIR);
+#endif
 boolean serverMode = false;
 boolean nonInteractivePlayback = false;
 boolean hasGraphics = false;
