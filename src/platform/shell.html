@@ -386,11 +386,16 @@
       canvas.style.width = w + 'px';
       canvas.style.height = h + 'px';
     }
+    // Re-fit when container resizes (window resize, layout changes)
     if (typeof ResizeObserver !== 'undefined') {
       new ResizeObserver(fitCanvas).observe(document.getElementById('canvas-container'));
     } else {
       window.addEventListener('resize', fitCanvas);
     }
+    // Re-fit when SDL changes the canvas backing store dimensions
+    new MutationObserver(fitCanvas).observe(document.getElementById('canvas'), {
+      attributes: true, attributeFilter: ['width', 'height']
+    });
 
     var Module = {
       canvas: (function() {
