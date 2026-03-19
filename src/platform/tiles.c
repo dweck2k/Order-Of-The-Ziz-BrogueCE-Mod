@@ -4,12 +4,8 @@
 #include "platform.h"
 #include "tiles.h"
 
-#ifdef __EMSCRIPTEN__
-#include <stdio.h>
-#define WASM_DBG(fmt, ...) printf("[WASM tiles] " fmt "\n", ##__VA_ARGS__)
-#else
+// Debug macro (no-op unless manually enabled)
 #define WASM_DBG(fmt, ...)
-#endif
 
 #define PI  3.14159265358979323846
 

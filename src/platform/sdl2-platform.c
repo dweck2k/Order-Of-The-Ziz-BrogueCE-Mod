@@ -248,10 +248,6 @@ static boolean pollBrogueEvent(rogueEvent *returnEvent, boolean textInput) {
 
 
 static void _gameLoop() {
-#ifdef __EMSCRIPTEN__
-    printf("[WASM] _gameLoop() entered\n");
-#endif
-
 #ifdef SDL_PATHS
     char *path = SDL_GetBasePath();
     if (path) {
@@ -273,34 +269,15 @@ static void _gameLoop() {
     free(path);
 #endif
 
-#ifdef __EMSCRIPTEN__
-    printf("[WASM] Calling SDL_Init...\n");
-#endif
     if (SDL_Init(SDL_INIT_VIDEO) < 0) sdlfatal(__FILE__, __LINE__);
-#ifdef __EMSCRIPTEN__
-    printf("[WASM] SDL_Init OK\n");
-#endif
 
     if (!(IMG_Init(IMG_INIT_PNG) & IMG_INIT_PNG)) imgfatal(__FILE__, __LINE__);
-#ifdef __EMSCRIPTEN__
-    printf("[WASM] IMG_Init OK\n");
-#endif
 
     initTiles();
-#ifdef __EMSCRIPTEN__
-    printf("[WASM] initTiles OK\n");
-#endif
 
     lastEvent.eventType = EVENT_ERROR;
 
-#ifdef __EMSCRIPTEN__
-    printf("[WASM] Calling resizeWindow(%d, %d)...\n", windowWidth, windowHeight);
-#endif
     resizeWindow(windowWidth, windowHeight);
-#ifdef __EMSCRIPTEN__
-    printf("[WASM] resizeWindow OK\n");
-    printf("[WASM] Calling rogueMain()...\n");
-#endif
 
     int statusCode = rogueMain();
 

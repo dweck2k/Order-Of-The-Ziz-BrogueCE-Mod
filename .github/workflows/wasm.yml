@@ -33,13 +33,9 @@ jobs:
       env:
         EM_EXCLUSIVE_CACHE_ACCESS: "1"
       run: |
-        # Pre-build dependencies so SDL2_image port won't trigger them
         embuilder build sdl2 zlib libpng
         mkdir -p web
-        echo "=== emcc version ==="
-        emcc --version
-        echo "=== Building with STACK_SIZE=4194304 ==="
-        emcc -v \
+        emcc \
           src/brogue/*.c \
           src/variants/*.c \
           src/platform/main.c \
@@ -60,40 +56,12 @@ jobs:
           -sASYNCIFY \
           -sASYNCIFY_STACK_SIZE=131072 \
           "-sASYNCIFY_REMOVE=['Emscripten_HandleMouseMove','Emscripten_HandleMouseButton','Emscripten_HandleMouseFocus','Emscripten_HandleWheel','Emscripten_HandleKey','Emscripten_HandleKeyPress','Emscripten_HandleFullscreenChange','Emscripten_HandleResize','Emscripten_HandleCanvasResize','Emscripten_HandleVisibilityChange','Emscripten_HandleFocus','Emscripten_HandlePointerLockChange','Emscripten_HandleTouch']" \
-          -sASSERTIONS=1 \
           -sALLOW_MEMORY_GROWTH=1 \
           -sINITIAL_MEMORY=67108864 \
           -sSTACK_SIZE=4194304 \
           --preload-file bin/assets@assets \
           --shell-file src/platform/shell.html \
           -o web/brogue.html
-
-    - name: "Verify stack size in build output"
-      run: |
-        echo "=== Install wabt ==="
-        sudo apt-get install -y wabt 2>/dev/null || true
-        echo "=== Disassemble emscripten_stack_init ==="
-        wasm-objdump -d --section=code web/brogue.wasm 2>/dev/null | grep -A 20 '<emscripten_stack_init>' || true
-        echo "=== WASM Global section ==="
-        wasm-objdump -x web/brogue.wasm 2>/dev/null | grep -A 5 'Global\[' || true
-        echo "=== Node.js: instantiate WASM and read stack values ==="
-        node -e "
-          const fs = require('fs');
-          const buf = fs.readFileSync('web/brogue.wasm');
-          WebAssembly.instantiate(buf, {
-            env: new Proxy({}, { get: (t,k) => (...a) => 0 }),
-            wasi_snapshot_preview1: new Proxy({}, { get: (t,k) => (...a) => 0 }),
-          }).then(({instance}) => {
-            const e = instance.exports;
-            if (e.emscripten_stack_init) e.emscripten_stack_init();
-            console.log('stack_base:', e.emscripten_stack_get_base());
-            console.log('stack_end:', e.emscripten_stack_get_end());
-            console.log('stack_size:', e.emscripten_stack_get_base() - e.emscripten_stack_get_end());
-            console.log('stack_current:', e.emscripten_stack_get_current());
-          }).catch(err => console.error('Instantiation failed:', err.message));
-        " || echo "Node check failed"
-        echo "=== JS file size ==="
-        wc -c web/brogue.js web/brogue.wasm
 
     - name: "Add SharedArrayBuffer support (coi-serviceworker)"
       run: cp src/platform/coi-serviceworker.min.js web/
