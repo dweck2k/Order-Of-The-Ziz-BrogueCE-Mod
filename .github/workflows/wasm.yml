@@ -47,7 +47,7 @@ jobs:
           -std=c99 -O2 \
           -Wall -Wno-parentheses -Wno-unused-result -Wformat \
           -DBROGUE_SDL \
-          -DDATADIR=. \
+          -DDATADIR=/ \
           -DRELEASE \
           -DBROGUE_EXTRA_VERSION= \
           -sUSE_SDL=2 \
