@@ -70,29 +70,28 @@ jobs:
 
     - name: "Verify stack size in build output"
       run: |
-        echo "=== Install wabt for wasm-objdump ==="
+        echo "=== Install wabt ==="
         sudo apt-get install -y wabt 2>/dev/null || true
-        echo "=== WASM globals (stack-related) ==="
-        wasm-objdump -x web/brogue.wasm 2>/dev/null | grep -i stack || echo "wasm-objdump not available"
-        echo "=== WASM global section ==="
-        wasm-objdump -x web/brogue.wasm 2>/dev/null | head -60 || true
-        echo "=== Node.js: read WASM stack globals ==="
+        echo "=== Disassemble emscripten_stack_init ==="
+        wasm-objdump -d --section=code web/brogue.wasm 2>/dev/null | grep -A 20 '<emscripten_stack_init>' || true
+        echo "=== WASM Global section ==="
+        wasm-objdump -x web/brogue.wasm 2>/dev/null | grep -A 5 'Global\[' || true
+        echo "=== Node.js: instantiate WASM and read stack values ==="
         node -e "
           const fs = require('fs');
           const buf = fs.readFileSync('web/brogue.wasm');
-          const mod = new WebAssembly.Module(buf);
-          const exports = WebAssembly.Module.exports(mod);
-          console.log('Exports with stack in name:');
-          exports.filter(e => /stack/i.test(e.name)).forEach(e => console.log(' ', e));
-          // Instantiate with minimal imports to read globals
-          const imports = WebAssembly.Module.imports(mod);
-          console.log('Imports with stack in name:');
-          imports.filter(i => /stack/i.test(i.name)).forEach(i => console.log(' ', i));
+          WebAssembly.instantiate(buf, {
+            env: new Proxy({}, { get: (t,k) => (...a) => 0 }),
+            wasi_snapshot_preview1: new Proxy({}, { get: (t,k) => (...a) => 0 }),
+          }).then(({instance}) => {
+            const e = instance.exports;
+            if (e.emscripten_stack_init) e.emscripten_stack_init();
+            console.log('stack_base:', e.emscripten_stack_get_base());
+            console.log('stack_end:', e.emscripten_stack_get_end());
+            console.log('stack_size:', e.emscripten_stack_get_base() - e.emscripten_stack_get_end());
+            console.log('stack_current:', e.emscripten_stack_get_current());
+          }).catch(err => console.error('Instantiation failed:', err.message));
         " || echo "Node check failed"
-        echo "=== JS: grep for stack_base/stack_end assignments ==="
-        grep -oP '(stack_base|stack_end|__stack_pointer|STACK_SIZE)\s*[=:]\s*\d+' web/brogue.js | head -10 || true
-        echo "=== JS: grep for emscripten_stack ==="
-        grep -n 'emscripten_stack' web/brogue.js | head -10 || true
         echo "=== JS file size ==="
         wc -c web/brogue.js web/brogue.wasm
 
