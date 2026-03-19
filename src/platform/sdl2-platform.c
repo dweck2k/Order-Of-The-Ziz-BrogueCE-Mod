@@ -78,42 +78,42 @@ static boolean eventFromKey(rogueEvent *event, SDL_Keycode key) {
     }
 
     /*
-    Only process keypad events when we're holding a modifier, as there is no
-    TextInputEvent then.
+    Always process keypad events from KEYDOWN. On native, numpad keys without
+    modifiers also generate TextInputEvents ('0'-'9'), so we use a flag
+    (numpadHandled) to suppress the duplicate. In browsers, numpad keys may
+    NOT generate TextInputEvents, making this the only way to capture them.
     */
-    if (event->shiftKey || event->controlKey) {
-        switch (key) {
-            case SDLK_KP_0:
-                event->param1 = NUMPAD_0;
-                return true;
-            case SDLK_KP_1:
-                event->param1 = NUMPAD_1;
-                return true;
-            case SDLK_KP_2:
-                event->param1 = NUMPAD_2;
-                return true;
-            case SDLK_KP_3:
-                event->param1 = NUMPAD_3;
-                return true;
-            case SDLK_KP_4:
-                event->param1 = NUMPAD_4;
-                return true;
-            case SDLK_KP_5:
-                event->param1 = NUMPAD_5;
-                return true;
-            case SDLK_KP_6:
-                event->param1 = NUMPAD_6;
-                return true;
-            case SDLK_KP_7:
-                event->param1 = NUMPAD_7;
-                return true;
-            case SDLK_KP_8:
-                event->param1 = NUMPAD_8;
-                return true;
-            case SDLK_KP_9:
-                event->param1 = NUMPAD_9;
-                return true;
-        }
+    switch (key) {
+        case SDLK_KP_0:
+            event->param1 = NUMPAD_0;
+            return true;
+        case SDLK_KP_1:
+            event->param1 = NUMPAD_1;
+            return true;
+        case SDLK_KP_2:
+            event->param1 = NUMPAD_2;
+            return true;
+        case SDLK_KP_3:
+            event->param1 = NUMPAD_3;
+            return true;
+        case SDLK_KP_4:
+            event->param1 = NUMPAD_4;
+            return true;
+        case SDLK_KP_5:
+            event->param1 = NUMPAD_5;
+            return true;
+        case SDLK_KP_6:
+            event->param1 = NUMPAD_6;
+            return true;
+        case SDLK_KP_7:
+            event->param1 = NUMPAD_7;
+            return true;
+        case SDLK_KP_8:
+            event->param1 = NUMPAD_8;
+            return true;
+        case SDLK_KP_9:
+            event->param1 = NUMPAD_9;
+            return true;
     }
 
     // Ctrl+letter doesn't give a TextInputEvent
@@ -149,6 +149,7 @@ platform-specific inputs/behaviours.
 */
 static boolean pollBrogueEvent(rogueEvent *returnEvent, boolean textInput) {
     static int mx = 0, my = 0;
+    static boolean numpadHandled = false; // suppress duplicate TEXTINPUT after numpad KEYDOWN
 
     returnEvent->eventType = EVENT_ERROR;
     returnEvent->shiftKey = _modifierHeld(0);
@@ -185,6 +186,11 @@ static boolean pollBrogueEvent(rogueEvent *returnEvent, boolean textInput) {
             }
 
             if (eventFromKey(returnEvent, key)) {
+                // Track if this was a numpad key so we can suppress the
+                // duplicate TEXTINPUT event that SDL may also generate
+                if (key >= SDLK_KP_0 && key <= SDLK_KP_9) {
+                    numpadHandled = true;
+                }
                 returnEvent->eventType = KEYSTROKE;
                 return true;
             }
@@ -197,6 +203,13 @@ static boolean pollBrogueEvent(rogueEvent *returnEvent, boolean textInput) {
             different SDL events.
             */
             char c = event.text.text[0];
+
+            // Suppress duplicate digit from numpad KEYDOWN that was already handled
+            if (numpadHandled && c >= '0' && c <= '9') {
+                numpadHandled = false;
+                continue;
+            }
+            numpadHandled = false;
 
             if (!textInput) {
                 c = applyRemaps(c);

@@ -59,6 +59,8 @@ jobs:
           -sALLOW_MEMORY_GROWTH=1 \
           -sINITIAL_MEMORY=67108864 \
           -sSTACK_SIZE=4194304 \
+          -sFORCE_FILESYSTEM=1 \
+          -lidbfs.js \
           --preload-file bin/assets@assets \
           --shell-file src/platform/shell.html \
           -o web/brogue.html

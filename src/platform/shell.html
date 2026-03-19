@@ -14,7 +14,8 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      min-height: 100vh;
+      height: 100vh;
+      overflow: hidden;
       padding: 12px 8px;
     }
 
@@ -44,17 +45,18 @@
       position: relative;
       display: flex;
       justify-content: center;
-      align-items: flex-start;
+      align-items: center;
+      flex: 1;
+      min-height: 0;
       width: 100%;
       max-width: 1400px;
+      overflow: hidden;
     }
 
     canvas {
       display: block;
       border: 1px solid #1e1808;
       background: #000;
-      width: 100% !important;
-      height: auto !important;
       image-rendering: pixelated;
       image-rendering: crisp-edges;
     }
@@ -365,6 +367,31 @@
     var errorEl    = document.getElementById('error-message');
     var totalDeps  = 0;
 
+    // ── Adaptive canvas sizing ──────────────────────────────────
+    function fitCanvas() {
+      var canvas = document.getElementById('canvas');
+      var container = document.getElementById('canvas-container');
+      if (!canvas.width || !canvas.height || !container.clientWidth) return;
+      var cw = container.clientWidth;
+      var ch = container.clientHeight;
+      var aspectRatio = canvas.width / canvas.height;
+      var w, h;
+      if (cw / ch > aspectRatio) {
+        h = ch;
+        w = Math.floor(ch * aspectRatio);
+      } else {
+        w = cw;
+        h = Math.floor(cw / aspectRatio);
+      }
+      canvas.style.width = w + 'px';
+      canvas.style.height = h + 'px';
+    }
+    if (typeof ResizeObserver !== 'undefined') {
+      new ResizeObserver(fitCanvas).observe(document.getElementById('canvas-container'));
+    } else {
+      window.addEventListener('resize', fitCanvas);
+    }
+
     var Module = {
       canvas: (function() {
         var c = document.getElementById('canvas');
@@ -374,6 +401,18 @@
         }, false);
         return c;
       })(),
+
+      preRun: [function() {
+        // Mount IDBFS for persistent saves
+        FS.mkdir('/saves');
+        FS.mount(IDBFS, {}, '/saves');
+        Module.addRunDependency('idbfs-load');
+        FS.syncfs(true, function(err) {
+          if (err) console.error('IDBFS load error:', err);
+          FS.chdir('/saves');
+          Module.removeRunDependency('idbfs-load');
+        });
+      }],
 
       setStatus: function(text) {
         if (!Module.setStatus.last) Module.setStatus.last = { text: '' };
@@ -406,6 +445,24 @@
 
       print:    function(t) { console.log(Array.prototype.join.call(arguments,' ')); },
       printErr: function(t) { console.error(Array.prototype.join.call(arguments,' ')); }
+    };
+
+    // ── Persist saves to IndexedDB ──────────────────────────────
+    function syncSaves() {
+      if (typeof FS !== 'undefined' && Module.calledRun) {
+        FS.syncfs(false, function(err) {
+          if (err) console.error('IDBFS sync error:', err);
+        });
+      }
+    }
+    setInterval(syncSaves, 5000);
+    window.addEventListener('beforeunload', syncSaves);
+
+    // Call fitCanvas once the game starts rendering
+    var origSetStatus = Module.setStatus;
+    Module.setStatus = function(text) {
+      origSetStatus.call(Module, text);
+      if (!text) setTimeout(fitCanvas, 100);
     };
 
     window.addEventListener('error', function(e) {
